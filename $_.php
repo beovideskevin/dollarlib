@@ -495,6 +495,7 @@ class Table extends Database
 	public function delete() 
 	{
 		// I didn't implemented this method because I think you should never delete anything.
+		// IMO you should mark the record as deleted using a flag, like active = 0.
 		// If you still feel you should delete something, don't forget to implement and call cascade.
 		// if (is_callable([$this, 'cascade']) && !$this->cascade()) return false;
 	}
@@ -529,7 +530,7 @@ interface Validations
 }
 
 /**
- * This class acts like a controller
+ * This class acts like a sort of a controller or router
  */
 class App
 {
@@ -991,7 +992,7 @@ class Template
 		if (!$this->fullLanguage) 
 			$this->setLang();
 		
-		// Apply the language in results first 
+		// Apply the results first to the layout 
 		$tmpHtml = $this->apply($this->fullLayout, $results);
 
 		// Now apply the default language. This second call is necessary because inside de definitions of $results 

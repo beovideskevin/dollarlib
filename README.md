@@ -150,3 +150,6 @@ my2cents.loc/btc?lan=en
 TO DO:
 - [ ] Implement relationships and validations in the example. 
 - [ ] Create tests with codeception.
+- [ ] Improve email methods
+- [ ] Add curl call to the $_ method  
+- [ ] Add {{}} to the templates (this is another way <:/>)
