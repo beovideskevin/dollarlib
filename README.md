@@ -103,7 +103,7 @@ After doing this add a file named "config.json" to the root folder with the foll
 	}
 }
 ```
-Don't forget to replace the values like "yourusername", "yourpassword" etc.
+Don't forget to replace the values like "yourusername", "yourpassword", etc.
 
 If you don't want to use a virtual host, you could just clone the repository in the root of your web documents and create the htaccess files. Create the config file but change the second line to "FILES_BASE_PATH": "/dollarlib/". Then go to /app/layouts/ and edit "main.html" so every reference to an external resource is prefixed with "/dollarlib/".
 
