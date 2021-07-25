@@ -207,9 +207,3 @@ function snippets($args)
     ];
     return $results;
 }
-
-function curlTest() {
-    global $_;
-    $a = $_("curl: www.google.com", "GET");
-    error_log(print_r($a, true));
-}
