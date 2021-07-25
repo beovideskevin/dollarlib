@@ -18,7 +18,7 @@ I developed this framkework using using WAMP. All the examples should work in an
 
 Options -Indexes
 ```
-After doing this add a file named "/config.json" to the root folder with the following code:
+After doing this add a file named "config.json" to the root folder with the following code:
 ```
 {
 	"FILES_BASE_PATH": "/",
@@ -40,7 +40,7 @@ After doing this add a file named "/config.json" to the root folder with the fol
 	},
 	
 	"EMAIL": {
-		"SYSTEM": "dollarlib@gmail.com",
+		"SYSTEM": "contact@dollarlib.loc",
 		"FROM": "Dollarlib",
 		"SERVER": "",
 		"PORT": "",
@@ -103,13 +103,15 @@ After doing this add a file named "/config.json" to the root folder with the fol
 	}
 }
 ```
+Don't forget to replace the values like "yourusername", "yourpassword" etc.
+
 If you don't want to use a virtual host, you could just clone the repository in the root of your web documents and create the htaccess files. Create the config file but change the second line to "FILES_BASE_PATH": "/dollarlib/". Then go to /app/layouts/ and edit "main.html" so every reference to an external resource is prefixed with "/dollarlib/".
 
 If you are using IIS or Nginx you will need to make some changes to "web.config" or the configuration files of your server (reproduce the logic in "/.htaccess"). 
 
-In order to make all the examples work you will need to import into the database the script located in the folder "migrartions". This was created for MySQL, if you are using PostgreSQL or somethng else, you may need to make some changes there too.
+In order to make the example work you will need to import into the database the script located in the folder "migrartions". This was created for MySQL, if you are using PostgreSQL or somethng else, you may need to make some changes there too.
 
-After this is done you can check the examples in the routes:
+After this is done you can check the example in the routes:
 ```
 dollarlib.loc/
 dollarlib.loc/contact
