@@ -9,3 +9,9 @@ $(document).ready(function () {
         return true;
     });
 });
+
+var onloadCallback = function() {
+    grecaptcha.render('recaptcha', {
+        'sitekey' : '<:SITE_KEY/>'
+    });
+};

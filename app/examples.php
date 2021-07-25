@@ -11,6 +11,8 @@ function login ($args)
 {
     global $_;
 
+    $recaptcha = $_("getConfig: recaptcha");
+    
     lan($args);
 
     if (!empty($args['rent'])) {
@@ -23,7 +25,8 @@ function login ($args)
     $results = [
         "OUTPUT"       => $_("inject: app/assets/login.html"),
         "MAIN_SCRIPT"  => $_("inject: app/assets/login.js"),
-        "ZIPVALUE"     => "33160"
+        "ZIPVALUE"     => "33160",
+        "SITE_KEY"     => $recaptcha['siteKey']
     ];
     return $results;
     
@@ -36,29 +39,35 @@ function pay ($args)
 {
     global $_;
 
-    if (!empty($args['zip']) && !empty($_SESSION['secret'])) {
-        $rentArray = $_("assoc: SELECT * FROM rent WHERE secret = ? AND zip = ? AND status = 'active'", [$_SESSION['secret'], $args['zip']]);
-        if (empty($rentArray)) {
-            header('Location: /login');    
-        }
+    $recaptcha = $_("getConfig: recaptcha");
+    if (!empty($args['g-recaptcha-response']) && !empty($args['zip']) && !empty($_SESSION['secret'])) 
+    {
+        $output = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".
+                              $recaptcha['secretKey'] . "&response=" . $args['g-recaptcha-response']), true);
+        if (isset($output['success']) && $output['success'] == true) {
+            $rentArray = $_("assoc: SELECT * FROM rent WHERE secret = ? AND zip = ? AND status = 'active'", [$_SESSION['secret'], $args['zip']]);
+            if (empty($rentArray)) {
+                header('Location: /login');    
+            }
 
-        $renterArray = $_("assoc: SELECT * FROM renter WHERE id = ? AND status = 'active'", [$rentArray['renter']]);
-        if (empty($renterArray)) {
-            header('Location: /login');    
+            $renterArray = $_("assoc: SELECT * FROM renter WHERE id = ? AND status = 'active'", [$rentArray['renter']]);
+            if (empty($renterArray)) {
+                header('Location: /login');    
+            }
+            
+            $cardArray = $_("assoc: SELECT * FROM cards WHERE renter = ? AND status = 'active'", [$renterArray['id']]);
+            if ($cardArray) {
+                $cardBtn = "<:CHANGECARD/>";
+                $payBtn = '<a class="button button-primary" href="/dashboard"><:PAYBTNTEXT/></a>';
+            }
+            else {
+                $cardBtn = "<:ADDCARD/>";
+                $payBtn = "";
+            }
+            $_SESSION['rent'] = $rentArray;
+            $_SESSION['renter'] = $renterArray;
+            $_SESSION['card'] = $cardArray;
         }
-        
-        $cardArray = $_("assoc: SELECT * FROM cards WHERE renter = ? AND status = 'active'", [$renterArray['id']]);
-        if ($cardArray) {
-            $cardBtn = "<:CHANGECARD/>";
-            $payBtn = '<a class="button button-primary" href="/dashboard"><:PAYBTNTEXT/></a>';
-        }
-        else {
-            $cardBtn = "<:ADDCARD/>";
-            $payBtn = "";
-        }
-        $_SESSION['rent'] = $rentArray;
-        $_SESSION['renter'] = $renterArray;
-        $_SESSION['card'] = $cardArray;
     }
     else {
         header('Location: /logout');
