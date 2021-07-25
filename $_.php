@@ -1247,9 +1247,18 @@ class Curl
 				}
 			}
 
+			unset($request['headers']);
+			unset($request['options']);
+			unset($request['connectTimeout']);
+			
 			if (isset($request['request'])) {
 				$request = $request['request'];
 			}
+		}
+
+		// if $request is still an array use http_build_query
+		if (is_array($request)) {
+			$request = http_build_query($request); 
 		}
 
 		// setup the request method and (optional) data
@@ -1294,7 +1303,11 @@ class Curl
 		
 		// set the timeout
 		curl_setopt($this->handle, CURLOPT_TIMEOUT, $connectTimeout);
-  
+		
+		// return a string instead of outputting
+		curl_setopt($this->handle, CURLOPT_RETURNTRANSFER, true);		
+
+		// execute the call
 		$result = curl_exec($this->handle);
 
 		$ret['result'] = $result;
