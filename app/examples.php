@@ -118,7 +118,7 @@ function dashboard ($args)
 {
     global $_;
 
-    if (!empty($_SESSION['paid'])) {
+    if (empty($_SESSION['paid'])) {
         $dashboard = "<:THANK_YOU/>";
     }
     else {
