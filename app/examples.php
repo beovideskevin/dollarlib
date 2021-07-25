@@ -13,7 +13,7 @@ function login ($args)
 
     lan($args);
 
-    if (isset($args['rent']) && !empty($args['rent'])) {
+    if (!empty($args['rent'])) {
         $_SESSION['secret'] = $args['rent'];
     }
     else {
@@ -36,8 +36,7 @@ function pay ($args)
 {
     global $_;
 
-    if (isset($args['zip']) && !empty($args['zip']) && 
-        isset($_SESSION['secret']) && !empty($_SESSION['secret'])) {
+    if (!empty($args['zip']) && !empty($_SESSION['secret'])) {
         $rentArray = $_("assoc: SELECT * FROM rent WHERE secret = ? AND zip = ? AND status = 'active'", [$_SESSION['secret'], $args['zip']]);
         if (empty($rentArray)) {
             header('Location: /login');    
@@ -85,10 +84,8 @@ function addCard ($args)
 
     $cardResult = "";
 
-    if (isset($args['name']) && !empty($args['name']) && 
-        isset($args['card']) && !empty($args['card']) &&
-        isset($args['cvv']) && !empty($args['cvv']) &&
-        isset($args['my']) && !empty($args['my'])) {
+    if (!empty($args['name']) && !empty($args['card']) &&
+        !empty($args['cvv']) && !empty($args['my'])) {
         $_(": UPDATE cards SET status = 'deleted' WHERE renter = ?", [$_SESSION['renter']['id']]);
         if ($cardId = $_("insertid: INSERT INTO cards (renter, token) VALUES (?,?)", [$_SESSION['renter']['id'], $args['card']])) {
             $cardArray = $_("assoc: SELECT * FROM cards WHERE id = ? AND status = 'active'", [$cardId]);
@@ -101,7 +98,7 @@ function addCard ($args)
             die();
         }
         else {
-            $cardResult = (isset($_SESSION['LANGUAGE_IN_USE']) && $_SESSION['LANGUAGE_IN_USE'] == "es") ? 
+            $cardResult = ($_SESSION['LANGUAGE_IN_USE'] == "es") ? 
                            "Vuelva a intentarlo, por favor" : "Try again, please";
         }
     }
@@ -121,6 +118,13 @@ function dashboard ($args)
 {
     global $_;
 
+    if (!empty($_SESSION['paid'])) {
+        $dashboard = "<:THANK_YOU/>";
+    }
+    else {
+        $dashboard = "<:NO_NEED/>";
+    }
+
     $table = '<table class="u-full-width"><thead><tr><th>Amount</th><th>Date</th></tr></thead><tbody>';
     $receipts = $_("assoclist: SELECT * FROM receipts ORDER BY created DESC");
     if ($receipts) {
@@ -133,9 +137,12 @@ function dashboard ($args)
     }
     $table .= '</tbody></table>';
 
+    $_SESSION['paid'] = true;
+
     $results = [
-        "OUTPUT"       => $_("inject: app/assets/dashboard.html"),
-        "RECEIPTS"     => $table
+        "OUTPUT"           => $_("inject: app/assets/dashboard.html"),
+        "DASHBOARD_RESULT" => $dashboard,
+        "RECEIPTS_RESULT"  => $table
     ];
     return $results;
 }
@@ -149,9 +156,8 @@ function contact ($args)
 
     $recaptcha = $_("getConfig: recaptcha");
 
-    if (isset($args['g-recaptcha-response']) && $args['g-recaptcha-response'] &&
-        isset($args['email']) && $args['email'] && isset($args['name']) && $args['name'] &&
-        isset($args['subject']) && $args['subject'] && isset($args['message']) && $args['message']) 
+    if (!empty($args['g-recaptcha-response']) && !empty($args['email']) && 
+        !empty($args['name']) && !empty($args['subject']) && !empty($args['message'])) 
     {
         $output = json_decode(file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=".
                                 $recaptcha['secretKey'] . "&response=" . $args['g-recaptcha-response']), true);
@@ -164,7 +170,7 @@ function contact ($args)
                     "namefrom" => $args['name']
                 ], 
                 [
-                    "OUTPUT" => $args['message'] . "<br>Origin: My2Cents" 
+                    "OUTPUT" => $args['message'] . "<br>Origin: DollarLib" 
                 ]
             );
             $emailMsg = $emailResult ? "EMAIL_MSG" : "EMAIL_ERROR";  

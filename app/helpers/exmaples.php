@@ -7,7 +7,7 @@ function lan($args)
 {
     global $_;
 
-    if (isset($args['lan']) && $args['lan']) {
+    if (!empty($args['lan'])) {
         $_SESSION['LANGUAGE_IN_USE'] = $args['lan'];
         $_("setlang: " . $args['lan']);
     }
@@ -18,9 +18,7 @@ function lan($args)
  */
 function enforce () 
 {
-	if (!isset($_SESSION['rent']) || empty($_SESSION['rent']) ||
-        !isset($_SESSION['renter']) || empty($_SESSION['renter'])) {
-            error_log("tre-");
+	if (empty($_SESSION['rent']) || empty($_SESSION['renter'])) {
 		header('Location: /logout');
         die();
 	}

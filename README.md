@@ -1,23 +1,8 @@
 # Dollarlib
 
-Dollarlib is a simple php framework. You can see a full working example here: <a href="https://my2cents.eldiletante.com/">my2cents.eldiletante.com</a>
+Dollarlib is a simple php framework. You can see a full working example here: <a href="https://dollarlib.com/">dollarlib.com</a>
 
 I developed this framkework using using WAMP. All the examples should work in an Apache virtual host; create your own and name it "dollarlib.loc". After cloning the repository create two files. The first "/.htaccess" with the code: 
-```
-<IfModule mod_rewrite.c>
-    RewriteEngine on
-    RewriteRule   ^$ public/    [L]
-    RewriteRule   ((?s).*) public/$1 [L]
-</IfModule>
-
-<Files "config.json">
-	Order Allow,Deny
-	Deny from all
-</Files>
-
-Options -Indexes
-```
-And the second "/public/.htaccess" with these lines:
 ```
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -25,6 +10,11 @@ And the second "/public/.htaccess" with these lines:
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^((?s).*)$ index.php?_url=$1 [QSA,L]
 </IfModule>
+
+<Files "config.json">
+	Order Allow,Deny
+	Deny from all
+</Files>
 
 Options -Indexes
 ```
@@ -127,14 +117,9 @@ In order to make all the examples work you will need to import into the database
 
 After this is done you can check the examples in the routes:
 ```
-my2cents.loc/
-my2cents.loc/snippets
-my2cents.loc/contact
+dollarlib.loc/
+dollarlib.loc/contact
 ```
 
-
 TO DO:
-- [ ] Implement relationships and validations in the example. 
 - [ ] Create tests with codeception.
-- [ ] Improve email methods
-- [ ] Add curl call to the $_ method  
