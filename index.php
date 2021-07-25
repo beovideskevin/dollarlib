@@ -5,6 +5,6 @@
 
 session_start();
 
-require_once('../$_.php');
+require_once('$_.php');
 
 $_("run");

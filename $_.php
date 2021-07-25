@@ -555,7 +555,7 @@ class App
 	 */
 	public function config($filepath = '') 
 	{ 
-		$filepath = $filepath ? $filepath . '.json' : '../config.json';
+		$filepath = $filepath ? $filepath . '.json' : 'config.json';
 					
 		self::$config = json_decode(file_get_contents($filepath), true);
 		

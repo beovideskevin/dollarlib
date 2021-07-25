@@ -122,7 +122,7 @@ function dashboard ($args)
     global $_;
 
     $table = '<table class="u-full-width"><thead><tr><th>Amount</th><th>Date</th></tr></thead><tbody>';
-    $receipts = $_("assoclist: SELECT * FROM receipts ORDER created DESC");
+    $receipts = $_("assoclist: SELECT * FROM receipts ORDER BY created DESC");
     if ($receipts) {
         foreach ($receipts as $receipt) {
             $table .= "<tr>";
