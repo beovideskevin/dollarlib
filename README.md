@@ -1,8 +1,8 @@
-# My2cents
+# Dollarlib
 
-My2cents is a simple php framework. You can see a full working example here: <a href="https://my2cents.eldiletante.com/">my2cents.eldiletante.com</a>
+Dollarlib is a simple php framework. You can see a full working example here: <a href="https://my2cents.eldiletante.com/">my2cents.eldiletante.com</a>
 
-I developed this framkework using using WAMP. All the examples should work in an Apache virtual host; create your own and name it "my2cents.loc". After cloning the repository create two files. The first "/.htaccess" with the code: 
+I developed this framkework using using WAMP. All the examples should work in an Apache virtual host; create your own and name it "dollarlib.loc". After cloning the repository create two files. The first "/.htaccess" with the code: 
 ```
 <IfModule mod_rewrite.c>
     RewriteEngine on
@@ -44,14 +44,14 @@ After doing this add a file named "/config.json" to the root folder with the fol
 		"ADAPTER": "MYSQL",
 		"HOST": "localhost",
 		"PORT": "3306",
-		"DATABASE": "my2cents",
+		"DATABASE": "dollarlib",
 		"USER": "yourusername",
 		"PASSWORD": "yourpassword"
 	},
 	
 	"EMAIL": {
-		"SYSTEM": "my2cents@gmail.com",
-		"FROM": "My2cents",
+		"SYSTEM": "dollarlib@gmail.com",
+		"FROM": "Dollarlib",
 		"SERVER": "",
 		"PORT": "",
 		"USER": "",
@@ -71,55 +71,55 @@ After doing this add a file named "/config.json" to the root folder with the fol
 	
 	"ROUTES": {
 		"DEFAULT": {
-			"class": "BTC",
-			"method": "FullExample",
-			"layout": "example"
+			"action" : "login",
+			"args": "{\"zip\": 33160}"
 		},
 
-		"404": "notFound",
-		
-		"example1": "hello",
-		
-		"example2": {
-			"redirect": "/example1",
-			"hello": "hello" 
+		"pay": {
+			"action": "pay",
+			"enforce": "enforce"
 		},
 		
-		"example3" : {
-			"action": "arguments",
-			"args": "{\"test\": \"1\", \"outside\": {\"inside\": \"1\"}}"
+		"addcard": {
+			"action": "addCard",
+			"enforce": "enforce"
 		},
-		
-		"login": "login",
+
+		"thanks": {
+			"action": "thanks",
+			"enforce": "enforce"
+		},
+
+		"dashboard": {
+			"action": "dashboard",
+			"enforce": "enforce"
+		},
+
+		"contact": "contact",
+
+		"snippets": "snippets",
 		
 		"logout": "logout",
-		
-		"example4": {
-			"action": "publicArea",
-			"private": {
-				"enforce": "enforce",
-				"action": "privateArea"
-			}
+
+		"es": {
+			"redirect": "/?lan=es"
 		},
 
-		"ajax": {
-			"action": "ajax",
-			"admin": {
-				"action": "helloAjax",
-				"enforce": "enforce"
-			}
+		"en": {
+			"redirect": "/?lan=en"
 		},
-		
-		"btc": {
-			"refresh": {
-				"class": "BTC",
-				"method": "refreshBTCPrice"
-			}
+
+		"login": {
+			"redirect": "/"
+		},
+
+		"404": {
+			"redirect": "/"
 		}
 	}
 }
 ```
-If you don't want to use a virtual host, you could just clone the repository in the root of your web documents and create the htaccess files. Create the config file but change the second line to "FILES_BASE_PATH": "/my2cents/". Then go to /app/layouts/ and edit both "example.html" and "quotesLay.html"; every reference to an external resource should be prefixed with "/my2cents/".
+If you don't want to use a virtual host, you could just clone the repository in the root of your web documents and create the htaccess files. Create the config file but change the second line to "FILES_BASE_PATH": "/dollarlib/". Then go to /app/layouts/ and edit both "example.html" and "quotesLay.html"; every reference to an external resource should be prefixed with "/dollarlib/".
 
 If you are using IIS or Nginx you will need to make some changes to "web.config" or the configuration files of your server (reproduce the logic in "/.htaccess" and "/public/.htaccess"). 
 
@@ -128,22 +128,8 @@ In order to make all the examples work you will need to import into the database
 After this is done you can check the examples in the routes:
 ```
 my2cents.loc/
-my2cents.loc/example1
-my2cents.loc/example2
-my2cents.loc/example2/hello
-my2cents.loc/example3
-my2cents.loc/example4
-my2cents.loc/example4/private
-my2cents.loc/login
-my2cents.loc/example4/private
-my2cents.loc/logout
-my2cents.loc/ajax/admin
-my2cents.loc/login
-my2cents.loc/ajax/admin
-my2cents.loc/logout
-my2cents.loc/btc
-my2cents.loc/btc?lan=es
-my2cents.loc/btc?lan=en
+my2cents.loc/snippets
+my2cents.loc/contact
 ```
 
 
@@ -152,4 +138,3 @@ TO DO:
 - [ ] Create tests with codeception.
 - [ ] Improve email methods
 - [ ] Add curl call to the $_ method  
-- [ ] Add {{}} to the templates (this is another way <:/>)

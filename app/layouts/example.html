@@ -27,6 +27,83 @@
 	<!-- Custom Stylesheet
 	============================================= -->
 	<style>
+		/* Navbar */
+		.navbar {
+			position: fixed;
+			top: 0;
+			left: 0;
+		}
+		.navbar + .docs-section {
+			border-top-width: 0;
+		}
+		.navbar, .navbar-spacer {
+			display: block;
+			width: 100%;
+			height: 6.5rem;
+			background: #fff;
+			z-index: 99;
+			border-top: 1px solid #eee;
+			border-bottom: 1px solid #eee;
+		}
+		.navbar > .container {
+			width: 100%;
+		}
+		.navbar-list {
+			list-style: none;
+			margin-bottom: 0;
+		}
+		.navbar-item {
+			position: relative;
+			float: left;
+			margin-bottom: 0;
+		}
+		.navbar-link {
+			text-transform: uppercase;
+			font-size: 11px;
+			font-weight: 600;
+			letter-spacing: .2rem;
+			margin-right: 35px;
+			text-decoration: none;
+			line-height: 6.5rem;
+			color: #222;
+		}
+
+		/* Sections */
+		.section {
+    		padding: 7rem 0 7rem;
+		}
+
+		.section-heading, .section-description {
+			margin-bottom: 1.2rem;
+		}
+
+		/* Github */
+		.github {
+			background-image: url('/images/bg.png');
+			background-size: cover;
+			color: #fff;
+			text-align: center;
+		}
+		.github .section-description {
+			margin-bottom: 4rem;
+		}
+
+		/* main title */
+		#mainTitle {
+			color: #33C3F0;
+			font-weight: bold;
+		}
+
+		#okTitle {
+			color: #33C3F0;
+			font-weight: bold;
+		}
+
+		#errorTitle {
+			color: #f00;
+			font-weight: bold;
+		}
+
 		<:MAIN_STYLE/>
 	</style>
 	
@@ -41,10 +118,11 @@
 		<nav class="navbar">
 			<div class="container">
 				<ul class="navbar-list">
-					<li class="navbar-item"><a class="navbar-link" href="#btcSection" id="btc"><:MENU1/></a></li>
-					<li class="navbar-item"><a class="navbar-link" href="#contactSection" id="contact"><:MENU2/></a></li>
-					<li class="navbar-item"><a class="navbar-link" href="en" id="en"><:MENU3/></a></li>
-					<li class="navbar-item"><a class="navbar-link" href="es" id="es"><:MENU4/></a></li>
+					<li class="navbar-item"><a class="navbar-link" href="/"><:HOMEMENU/></a></li>
+					<li class="navbar-item"><a class="navbar-link" href="snippets"><:SNIPPETSMENU/></a></li>
+					<li class="navbar-item"><a class="navbar-link" href="contact"><:CONTACTMENU/></a></li>
+					<li class="navbar-item"><a class="navbar-link" href="en"><:ENMENU/></a></li>
+					<li class="navbar-item"><a class="navbar-link" href="es"><:ESMENU/></a></li>
 				</ul>
 			</div>
 		</nav>
@@ -60,51 +138,7 @@
 		</div>
 	</div>
 
-	<div class="section" id="btcSection"> 
-		<div class="container">
-			<div class="">
-				<h4 id="mainTitle"><:HEADER/></h4>
-				<p><:SUB_HEADER/> <a href="https://github.com/beovideskevin/my2cents" target="_blank"">my2cents</a></p>
-			</div>
-			<div class="" id="result">
-				<:CONTENT/>
-			</div>
-			<div class="">
-				<:BTN/>
-			</div>
-		</div>	
-	</div>
-
-	<div class="section contact" id="contactSection">
-		<div class="container">
-			<div class="">
-				<h4 id="mainTitle"><:CONTACT/></h4>
-				<:EMAIL_RESULT/>
-			</div>
-			<form method="POST" action="/" id="contactForm">
-				<div class="row">
-					<div class="four columns">
-						<label for="exampleNameInput"><:FORM_NAME/></label>
-						<input class="u-full-width" type="text" placeholder="name" name="name" id="exampleNameInput">
-					</div>
-					<div class="four columns">
-						<label for="exampleEmailInput"><:FORM_EMAIL/></label>
-						<input class="u-full-width" type="email" placeholder="test@mailbox.com" name="email" id="exampleEmailInput">
-					</div>
-					<div class="four columns">
-						<label for="exampleSubjectInput"><:FORM_SUBJECT/></label>
-						<input class="u-full-width" type="text" placeholder="hello..." name="subject" id="exampleSubjectInput">
-					</div>
-				</div>
-				<label for="exampleMessage"><:FORM_MSG/></label>
-				<textarea class="u-full-width" placeholder="Hi Kevin …" name="message" id="exampleMessage"></textarea>
-				<div id="recaptcha"></div>
-				<input class="button-primary" type="submit" value="Submit">
-			</form>
-			<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer>
-			</script>
-		</div>
-	</div>
+	<:OUTPUT/>
 	
 	<!-- External JavaScripts
 	============================================= -->

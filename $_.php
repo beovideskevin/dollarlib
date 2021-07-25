@@ -2,7 +2,7 @@
 
 /****************************************************************************************
 
-	My2cents - https://github.com/beovideskevin/my2cents
+	DollarLib - https://github.com/beovideskevin/my2cents
 	Copyright (c) 2019 El Diletante Digital
 
 	This is the main file of the framework and probably the only one you really need.
@@ -767,9 +767,8 @@ class App
 			}
 		}
 		
-		if (!$args)
-			$args = $_REQUEST;
-					
+		$args = array_merge($args, $_REQUEST);
+
 		// if there is no _url put the default
 		if (!self::$url) {
 			$action = self::$routes['DEFAULT'];
@@ -948,10 +947,13 @@ class Template
 			// this is escaping the $ in the string
 			$content = addcslashes($content, '\\$'); 
 			$html = preg_replace('/\<:'.$name.'\/\>/', $content, $html);
+			$html = preg_replace('/{{'.$name.'}}/', $content, $html);
 		}
 
-		if ($clean)
+		if ($clean) {
 			$html = preg_replace('/\<:(.*)\/\>/', '', $html);
+			$html = preg_replace('/{{((?:[^}]|}[^}])+)}}/', '', $html);
+		}
 
 		return $html;
 	}
@@ -1209,7 +1211,7 @@ class Curl
 	 * @param $options more options for the curl call ()
 	 * @param $connectTimeout the amount of time tofor the timeout
 	 */
-	public function sendHttp($method, $url, $request = '', $headers = array(), $options = array(), $connectTimeout = 30) 
+	public function sendHttp($url, $method, $request = '', $headers = array(), $options = array(), $connectTimeout = 30) 
 	{
 		$ret = array(
 			'result' => false,
@@ -1220,7 +1222,7 @@ class Curl
 		if (!$method || !$url) {
 			return $ret;
 		}
-
+		
 		// if this is a new url, reset the handle and set the lastUrl
 		if ($url !== $this->lastUrl) {
 			if ($this->handle) {
@@ -1228,6 +1230,26 @@ class Curl
 			}
 			$this->handle = curl_init($url);
 			$this->lastUrl = $url;
+		}
+
+		if (is_array($request)) {
+			foreach ($request as $key => $value) {
+				switch ($key) {
+					case 'headers': 
+						$headers = $value;
+						break;
+					case 'options': 
+						$options = $value;
+						break;
+					case 'connectTimeout': 
+						$connectTimeout = $value;
+						break;
+				}
+			}
+
+			if (isset($request['request'])) {
+				$request = $request['request'];
+			}
 		}
 
 		// setup the request method and (optional) data
@@ -1333,6 +1355,7 @@ $_ = function ($query = '', $options = [], $extras = '')
 	$database = $database ?? new Database();
 	$template = $template ?? new Template();
 	$email = $email ?? new Email();
+	$curl = $curl ?? new Curl();
 	
 	// first get the parts of the query into an array
 	list($action, $query) = Utils::extractQuery($query);
@@ -1451,9 +1474,18 @@ $_ = function ($query = '', $options = [], $extras = '')
 		 * EMAIL ACTIONS
 		 *********************/
 		
-		// send email takes an email, the subject and the content
+		// send email 
 		case 'email:':
 			return $email->sendEmail($query, $options, $extras);
+			break;
+
+		/*********************
+		 * CURL ACTIONS
+		 *********************/
+		
+		// send curl call
+		case 'curl:':
+			return $curl->sendHttp($query, $options, $extras);
 			break;
 		
 		/*********************

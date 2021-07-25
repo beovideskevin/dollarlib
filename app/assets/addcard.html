@@ -1,0 +1,31 @@
+<div class="section card" id="cardSection">
+    <div class="container">
+        <div class="">
+            <h4 id="mainTitle"><:CARD/></h4>
+            <:CARD_RESULT/>
+        </div>
+        <form method="POST" action="/addcard" id="cardForm">
+            <div class="row">
+                <div class="one-half column">
+                    <label for="nameInput"><:FORM_NAME/></label>
+                    <input class="u-full-width" type="text" placeholder="name" name="name" id="nameInput">
+                </div>
+                <div class="one-half column">
+                    <label for="cardInput"><:FORM_CARD/></label>
+                    <input class="u-full-width" type="text" placeholder="xxxx-xxxx-xxxx-xxxx" name="card" id="cardInput">
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-half column">
+                    <label for="cvvInput"><:FORM_CVV/></label>
+                    <input class="u-full-width" type="text" placeholder="cvv" name="cvv" id="cvvInput">
+                </div>
+                <div class="one-half column">
+                    <label for="myInput"><:FORM_MY/></label>
+                    <input class="u-full-width" type="text" placeholder="mmyy" name="my" id="myInput">
+                </div>
+            </div>
+            <input class="button-primary" type="submit" value="Submit">
+        </form>
+    </div>
+</div>
