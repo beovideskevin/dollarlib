@@ -1112,7 +1112,7 @@ class Email
 		}
 		else { 
 			// sent the email with php mail
-			return $this->sendMail($emailto, $subject, $body);
+			return $this->sendMail($emailto, $subject, $body, $emailfrom, $namefrom);
 		}
 	}
 	
@@ -1167,7 +1167,7 @@ class Email
 	 * @param $subject the subject of the email
 	 * @param $body the full body of the email
 	 */
-	protected function sendMail ($emailto, $subject, $body) 
+	protected function sendMail ($emailto, $subject, $body, $emailfrom, $namefrom) 
 	{
 		$from = self::$from . ' <' . self::$system . '>';
 
@@ -1177,7 +1177,7 @@ class Email
 		// set the headers
 		$headers = 'MIME-Version: 1.0' . "\n";
 		$headers .= 'From: ' . $from . "\n";
-		$headers .= 'Reply-To: ' . $from . "\n";
+		$headers .= 'Reply-To: ' . $namefrom . "<" . $emailfrom . ">\n";
 		$headers .= 'Content-Type: multipart/alternative;boundary=' . $boundary . "\n";
 		
 		// set the body and the txt version
