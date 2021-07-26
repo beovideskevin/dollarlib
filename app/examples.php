@@ -173,7 +173,7 @@ function contact ($args)
         if (isset($output['success']) && $output['success'] == true) {
             $emailResult = $_("email: ", 
                 [
-                    "emailto"=> "contact@eldiletante.com", 
+                    "emailto"=> "contact@dollarlib.com", 
                     "subject" => $args['subject'], 
                     "emailfrom" => $args['email'],
                     "namefrom" => $args['name']
