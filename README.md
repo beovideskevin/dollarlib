@@ -1,6 +1,6 @@
 # Dollarlib
 
-Dollarlib is a simple php lib, kind of a very flexible framework. You can see a full working example here: <a href="https://dollarlib.com/">dollarlib.com</a>. I created this lib to build my new media art website: <a href="https://eldiletante.com/">eldiletante.com</a>
+Dollarlib is a simple php lib, very naive, kind of a very flexible framework. I created this lib to build my new media art website: <a href="https://eldiletante.com/">eldiletante.com</a>
 
 I developed this framkework using using WAMP. All the examples should work in an Apache virtual host; create your own and name it "dollarlib.loc". After cloning the repository create two files. The first "/.htaccess" with the code: 
 ```
@@ -116,6 +116,3 @@ After this is done you can check the example in the routes:
 dollarlib.loc/
 dollarlib.loc/contact
 ```
-
-TO DO:
-- [ ] Create the code snippets as documentation... no rush
