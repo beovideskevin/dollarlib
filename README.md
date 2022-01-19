@@ -27,7 +27,7 @@ After doing this add a file named "config.json" to the root folder with the foll
 		"LANGUAGE_PATH": "app/languages/",
 		"DEFAULT_LANGUAGE": "en",
 		"LAYOUT_PATH": "app/layouts/",
-		"DEFAULT_LAYOUT": "example"
+		"DEFAULT_LAYOUT": "main"
 	},
 	
 	"DATABASE": {
