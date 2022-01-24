@@ -22,7 +22,7 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-	
+
 /**
  * This class encapsulates a few useful methods 
  */
@@ -53,7 +53,7 @@ Class Utils {
 				unset($parts[$i]); 
 			}
 
-			// dont forget to unset the action
+			// don't forget to unset the action
 			unset($parts[0]);
 
 			$query = implode(' ', $parts);
@@ -86,12 +86,75 @@ Class Utils {
 		else
 			return $item;
 	}
+
+	/**
+	 * Just return the string as html output, with especial symbols (< to &lt;) and new lines (\n to <br>) converted
+	 */
+	static public function htmlOut ($str = '') 
+	{
+		return nl2br(htmlspecialchars($str, ENT_QUOTES)); 
+	}
+
+	/**
+	 * Return a link properly formatted
+	 */
+	static public function linkOut ($urlpage = '', $getArgs = []) 
+	{
+		$url = rawurlencode($urlpage);
+		if (!empty($getArgs)) {
+			$url .= '?';
+			foreach ($getArgs as $key => $value)
+				$url .= $key . '=' . urlencode($value);
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Return the javascript code for output
+	 */
+	static public function jsOut($str = '') 
+	{
+		return addslashes(preg_replace('/(\r\n|\n|\r)/', '<br>', $str));
+	}
+}
+
+/**
+ * The interface that declares the methods a database adapter must have, 
+ * both PostgreSQLAdapter and MySQLAdapter use this interface.
+ */
+interface DbAdapter 
+{
+	/**
+	 * Connect to the database
+	 */
+	public function connect ($server, $port, $user, $pass, $database);
+	
+	/**
+	 * Disconnect 
+	 */
+	public function disconnect ();
+	
+	/**
+	 * Clean up the query
+	 */
+	public function sanitize ($var);
+
+	/**
+	 * Query the database
+	 */
+	public function query ($query);
+	
+	/**
+	 * Return the results
+	 */
+	public function result ($ret);
 }
 
 /**
  * The "driver" to connect and query PostgreSQL
  */
-class PostgreSQLAdapter 
+class PostgreSQLAdapter implements DbAdapter
 {
 	protected static $link = NULL, 
 				     $result = NULL; 
@@ -176,7 +239,7 @@ class PostgreSQLAdapter
 /**
  * The "driver" to connect and query MySQL
  */
-class MySQLAdapter 
+class MySQLAdapter implements DbAdapter
 {
 	protected static $link = NULL, 
 				     $result = NULL; 
@@ -192,7 +255,7 @@ class MySQLAdapter
 	public function connect($server, $port, $user, $pass, $database) 
 	{
 		self::$link = new mysqli($server, $user, $pass, $database, $port);
-		
+
 		if (!self::$link) 
 			die('Could not connect!');
 		
@@ -274,7 +337,7 @@ class Database
 				  $password = '';
 
 	/**
-	 * Establish a connection to the databse
+	 * Establish a connection to the database
  	 */ 
 	public function connect () 
 	{
@@ -294,8 +357,10 @@ class Database
 			self::$driver = new MySQLAdapter();
 		elseif (Utils::trimLower(self::$adapter) == 'postgresql')
 			self::$driver = new PostgreSQLAdapter();
-		else
-			die ('No adapter for the database!');
+		else {
+			error_log ('No adapter for the database!');
+			return false;
+		}
 
 		return self::$driver->connect($server, $port, $user, $pass, $database);
 	}
@@ -364,175 +429,9 @@ class Database
 }
 
 /**
- * This class works as a model. To add functionality to this table class just implement validations. 
- */
-class Table extends Database
-{
-	protected $_table, 
-		      $_id;
-
-	/**
-	 * Create a 
-	 * @param $table the table we are using
-	 * @param $id the id field 
- 	 */ 
-	function __construct ($table, $id = false) 
-	{
-		if (!$table) 
-			throw new Exception('ERROR: NO TABLE');
-		
-		$this->_table = $table;
-		$this->_id = $id;
-	}
-	
-	/** 
-	 * Assign values to the object
-	 * @param $properties an array with the properties to assign to the object
-	 */
-	public function assign ($properties = []) 
-	{
-		if (!$properties)
-			return false;
-
-		foreach ($properties as $key => $value)
-			$this->$key = $value;
-		
-		if (is_callable([$this, 'validate']) && !$this->validate())
-			return false;
-					
-		if (is_callable([$this, 'relate']) && !$this->relate())
-			return false;
-
-		return true;
-	}
-
-	/**
-	 * Sync the current object with the database, get the info from the database
-	 * @param $id the id of the record
-	 */
-	public function sync ($id = '') 
-	{
-		global $_;
-
-		$idName = $this->_id;
-		
-		$id = $id ? $id : $this->$idName;
-		
-		$result = $_("assoc: SELECT * FROM {$this->_table} WHERE {$idName} = '?' LIMIT 1", [$id]);
-		
-		if ($result) {
-			return $this->assign($result);
-		}
-		
-		return false;
-	}
-
-	/**
-	 * Save the model, insert or update a record
-	 * @param $properties an array with the properties to assign to the object
- 	 */ 
-	public function save ($properties = []) 
-	{ 
-		global $_;
-
-		// assign data if there is any
-		if ($properties) {
-			if (!$this->assign($properties))
-				return false;
-			$recordProps = $properties;
-		}
-		else 
-			$recordProps = get_object_vars($this);
-		
-		$idName = $this->_id;
-		$tableName = $this->_table;
-		
-		if ($idName && !empty($this->$idName)) { // this is an update
-			$query = "";
-			foreach ($recordProps as $key => $value) {
-				if ($key == '_table' || $key == '_id')
-					continue;
-				
-				$query .= $query ? "," : "";
-				$query .= $key . "='" . $value . "'";
-			}
-			$result = $_(": UPDATE {$tableName} SET {$query} WHERE {$idName} = '{$this->$idName}'");
-		}
-		else { // this is a new record
-			$insertKey = "";
-			$insertValue = "";
-			foreach ($recordProps as $key => $value) {
-				if ($key == '_table' || $key == '_id')
-					continue;
-				
-				$insertKey .= $insertKey ? "," : "";
-				$insertValue .= $insertValue ? "," : "";
-				
-				$insertKey .= $key;
-				$insertValue .= "'" . $value . "'"; 
-			}
-			$query = "insertid: INSERT INTO {$tableName} ({$insertKey}) VALUES ({$insertValue})";
-			
-			if (Utils::trimLower(Database::$adapter) == "postgresql") 
-				$query .= " RETURNING {$idName}";
-			
-			$result = $_($query);
-			
-			if ($result) 
-				$this->$idName = $result;
-		}
-	
-		if ($result) 
-			if (is_callable([$this, 'cascade']) && !$this->cascade())
-				return false;
-
-		return $result;
-	}
-	
-	/**
-	 * Deletes the record. 
-	 */
-	public function delete() 
-	{
-		// I didn't implemented this method because I think you should never delete anything.
-		// IMO you should mark the record as deleted using a flag, like active = 0.
-		// If you still feel you should delete something, don't forget to implement and call cascade.
-		// if (is_callable([$this, 'cascade']) && !$this->cascade()) return false;
-	}
-
-}
-
-/**
- * This interface is useful to extend the functionality of the Table class:
- * 	protected function validate () {} // This method is call for validate the values of the object
- * 	protected function relate () {} // This method is call to buil the external relationships
- * 	protected function cascade () {} // This method is called to delete the related records when deleting this one
- */
-interface Validations 
-{
-	/**
-	 * In this method you should implement the validations, 
-	 * it returns true if the values of the object are correct 
-	 * and false if they are wrong
-	 */
-	function validate ();
-	
-	/**
-	 * In this method you should build external relationships to this object 
-	 * and store them in the properties
-	 */
-	function relate ();
-	
-	/**
-	 * This method is called after save to update the related records 
-	 */
-	function cascade ();
-}
-
-/**
  * This class acts like a sort of a controller or router
  */
-class App
+class Application
 {
 	protected static $config = [], 
 				     $url = [], 
@@ -553,7 +452,7 @@ class App
 	 * Loads the configuration and registers the classes
 	 * @param $filepath the config file, if empty gets the default config.json
 	 */
-	public function config($filepath = '') 
+	public function setConfig($filepath = '') 
 	{ 
 		$filepath = $filepath ? $filepath . '.json' : 'config.json';
 					
@@ -564,9 +463,15 @@ class App
 		
 		foreach (self::$config as $key => $value) {
 			switch (Utils::trimLower($key)) {
+				// the main domain
+				case 'website': 
+					DEFINE ('WEBSITE', $value);
+					break;
+
 				// the main path
 				case 'files_base_path': 
 					DEFINE ('FILES_BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . $value);
+					DEFINE ('FILES_RELATIVE_PATH', $value);
 					break;
 	
 				// the path for the classes to include
@@ -595,7 +500,11 @@ class App
 							case 'default':
 								self::$routes['DEFAULT'] = Utils::trimLowerKeys($rVal);
 								break;
-								
+
+							case 'httperror':
+								self::$routes['HTTPERROR'] = Utils::trimLowerKeys($rVal);
+								break;
+		
 							default:
 								self::$routes[Utils::trimLower($rKey)] = Utils::trimLowerKeys($rVal);
 								break;
@@ -603,7 +512,7 @@ class App
 					}
 					break;
 				
-				// set the dafault template and language 
+				// set the default template and language 
 				case 'template':
 					foreach (self::$config[$key] as $tKey => $tVal) {
 						switch (Utils::trimLower($tKey)) {
@@ -632,7 +541,7 @@ class App
 					}
 					break;
 
-				// MySQL conection data
+				// Database connection data
 				case 'database': 
 					foreach (self::$config[$key] as $dbKey => $dbVal) {
 						switch (Utils::trimLower($dbKey)) {
@@ -698,40 +607,61 @@ class App
 	 * This method recursively includes all the files and classes
 	 * @param $folder the folder where to start
 	 * @param $exceptions files not to include
+	 * @param $first flag to indicate that this is the first call to the method 
 	 */
-	protected function register ($folder, $exceptions) 
+	public function register ($folder = "", $exceptions = []) 
 	{
-		if (!$folder)
-			return false;
-		
-		$otherFiles = [];
+		// The first time we are going to do som general including
+		if (!$folder) {
+			// Include the vendors
+			if (!empty(self::$includes['VENDORS']) && is_dir(FILES_BASE_PATH . self::$includes['VENDORS']) && 
+				file_exists(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php')) 
+			{
+				require_once(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php'); 
+			}
 
-		if (!in_array('$_', $exceptions))
-			$exceptions[] = '$_';
-			
-		$files = scandir($folder);
-		foreach ($files as $f) {
-			if ($f == '.' || $f == '..' || in_array($f, $exceptions))
-				continue;
-			// this is for the libraries installed with composer
-			elseif (is_dir($folder . $f) && $f == 'vendor' && file_exists($folder . 'vendor/autoload.php')) 
-				require_once($folder . 'vendor/autoload.php'); 
-			elseif (is_dir($folder . $f)) 
-				$otherFiles[] = $folder . $f;
-			elseif (substr($f, -4) == '.php')
-				include_once($folder . $f);
+			// register all the classes
+			if (!empty(self::$includes['FOLDERS'])) { 
+				$folders = explode(';', self::$includes['FOLDERS']); 
+
+				$exceptions = empty(self::$includes['EXCEPTIONS']) ? [] : explode(';', self::$includes['EXCEPTIONS']); 
+				
+				if (!in_array('$_', $exceptions))
+					$exceptions[] = '$_';
+
+				foreach ($folders as $f) {
+					if (!$f) 
+						continue;
+					$this->register(FILES_BASE_PATH . $f, $exceptions);
+				}
+			}
 		}
+		else {
+			$otherFiles = [];
 
-		if (!empty($otherFiles))
-			foreach ($otherFiles as $of)
-				$this->register($of . '/', $exceptions);
+			$files = scandir($folder);
+			foreach ($files as $f) {
+				if ($f == '.' || $f == '..' || in_array($f, $exceptions))
+					continue;
+				elseif (is_dir($folder . $f) && $f == 'vendor' && file_exists($folder . 'vendor/autoload.php')) 
+					continue;
+				elseif (is_dir($folder . $f)) 
+					$otherFiles[] = $folder . $f;
+				elseif (substr($f, -4) == '.php')
+					include_once($folder . $f);
+			}
+
+			if (!empty($otherFiles))
+				foreach ($otherFiles as $of)
+					$this->register($of . '/', $exceptions);
+		}
 	}
 
 	/**
 	 * Gets some info like layout, language, etc. that cascades down  
 	 * @param $action 
 	 */
-	public function processAction($action) {
+	public function process ($action) {
 		// private area of the website
 		if (isset($action['enforce']))  
 			self::$enforce = $action['enforce'];
@@ -758,7 +688,12 @@ class App
 	{
 		if (!$urlpath && isset($_REQUEST['_url']))
 			$urlpath = $_REQUEST['_url'];
-				
+
+		if (!empty(self::$routes['HTTPERROR']) && array_key_exists($urlpath, self::$routes['HTTPERROR'])) {
+			http_response_code(self::$routes['HTTPERROR'][$urlpath]);
+			die();
+		}
+
 		if ($urlpath) {
 			$all = explode('/', Utils::trimLower($urlpath));
 			foreach ($all as $value) {
@@ -771,8 +706,8 @@ class App
 
 		// if there is no _url put the default
 		if (!self::$url) {
-			$action = self::$routes['DEFAULT'];
-			$this->processAction($action);
+			$action = self::$routes['DEFAULT'] ?? "index";
+			$this->process($action);
 		} 
 		else {
 			$action = self::$routes;
@@ -782,11 +717,11 @@ class App
 				// check for the action
 				if (!empty($action[Utils::trimLower(self::$url[$index])])) { 
 					$action = $action[Utils::trimLower(self::$url[$index])];
-					$this->processAction($action);
+					$this->process($action);
 					$index++;
 				}
 				else {
-					$action = self::$routes['404'];
+					$action = self::$routes['404'] ?? "index";
 					break;
 				}
 			}
@@ -816,26 +751,8 @@ class App
 
             // there is something wrong here...
             else
-                $action = self::$routes['404'];
+                $action = self::$routes['404'] ?? "index";
         }
-
-        // register all the classes
-		if (!empty(self::$includes['FOLDERS'])) { 
-			$folders = explode(';', self::$includes['FOLDERS']); 
-
-			$exceptions = empty(self::$includes['EXCEPTIONS']) ? [] : explode(';', self::$includes['EXCEPTIONS']); 
-			
-			foreach ($folders as $f) {
-				if (!$f) 
-					continue;
-				$this->register(FILES_BASE_PATH . $f, $exceptions);
-			}
-		}
-
-		if (!empty(self::$includes['VENDORS']) && is_dir(FILES_BASE_PATH . self::$includes['VENDORS']) && 
-			file_exists(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php')) {
-			require_once(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php'); 
-		}
 		
 		// call the function that enforces login
 		if (!empty(self::$enforce) && is_callable(self::$enforce)) 
@@ -1001,37 +918,6 @@ class Template
 		// we can put other language tags <:/>, exmaple: "BTN" => "<input type='submit' value='<:SUBMIT_BTN/>'>"
 		return $this->apply($tmpHtml, $this->fullLanguage, true); 
 	}
-
-	/**
-	 * Just return the string as html output, with especial symbols (< to &lt;) and new lines (\n to <br>) converted
-	 */
-	static public function htmlOut ($str = '') 
-	{
-		return nl2br(htmlspecialchars($str, ENT_QUOTES)); 
-	}
-
-	/**
-	 * Return a link properly formatted
-	 */
-	static public function linkOut ($urlpage = '', $getArgs = []) 
-	{
-		$url = rawurlencode($urlpage);
-		if (!empty($getArgs)) {
-			$url .= '?';
-			foreach ($getArgs as $key => $value)
-				$url .= $key . '=' . urlencode($value);
-		}
-
-		return $url;
-	}
-
-	/**
-	 * Return the javascript code for output
-	 */
-	static public function jsOut($str = '') 
-	{
-		return addslashes(preg_replace('/(\r\n|\n|\r)/', '<br>', $str));
-	}
 }
 
 /**
@@ -1157,7 +1043,8 @@ class Email
 			error_log('Mailer Error: ' . $mail->ErrorInfo);
 			return false;
 		}
-		 
+		
+		error_log('Mailer Success: ' . print_r($mail, true));
 		return true;
 	} 
 	
@@ -1318,37 +1205,6 @@ class Curl
 
 		return $ret;
 	}
-	
-	/*
-		Useful snippets of code, you do not have to use all those options: 
-
-		$query_string = http_build_query($data_array); 
-		$time = 30;
-		$useragent='InvestiGate API Access';
-		$userpwd = array(
-			"api_username" => "", 
-			"api_password" => ""
-		);
-		$curl = new Curl();
-		$result = $curl->sendHttp(
-			"POST", 
-			"https://www.example.com/",
-			"",
-			[],
-			[
-				CURLOPT_SSL_VERIFYPEER => 0,
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_VERBOSE        => false,
-				CURLOPT_POSTFIELDS     => $query_string,
-				CURLOPT_POST           => true,
-				CURLOPT_HTTPGET        => true,
-				CURLOPT_TIMEOUT        => $time,
-				CURLOPT_CONNECTTIMEOUT => $time,
-				CURLOPT_USERAGENT      => $useragent,
-				CURLOPT_USERPWD        => $userpwd['api_username'].':'.$userpwd['api_password']
-			]
-		);
-	*/
 }
 
 /**
@@ -1364,7 +1220,7 @@ $_ = function ($query = '', $options = [], $extras = '')
 		   $template = NULL, 
 		   $email = NULL;
 
-	$app = $app ?? new App();
+	$app = $app ?? new Application();
 	$database = $database ?? new Database();
 	$template = $template ?? new Template();
 	$email = $email ?? new Email();
@@ -1382,7 +1238,8 @@ $_ = function ($query = '', $options = [], $extras = '')
 		
 		// run the app, automatic and simple
 		case 'run': 
-			$app->config();
+			$app->setConfig();
+			$app->register();
 			$database->connect();
 			// if the router returned null pass an empty array to the render, 
 			// this avoids warnings from php 
@@ -1394,12 +1251,12 @@ $_ = function ($query = '', $options = [], $extras = '')
 		 *********************/
 
 		// load the config from some file
-		case 'config:':
+		case 'setconfig:':
 			$options = $query;
 			
 		// set the config	
-		case 'config': 
-			return $app->config($options);
+		case 'setconfig': 
+			return $app->setConfig($options);
 
 		// Get a specific index in the configuration
         case 'getconfig:':
@@ -1409,12 +1266,21 @@ $_ = function ($query = '', $options = [], $extras = '')
         case 'getconfig':
             return $app->getConfig($options);
 
-		// route to some path
+		// Register other dependencies and libs
+		case 'register:':
+			$extras = $options;
+			$options = $query;
+			
+		// Register the dependencies 
+		case 'register': 
+			return $app->register($options, $extras);
+
+		// Route to some path
 		case 'route:':
 			$extras = $options;
 			$options = $query;
 			
-		// route the app
+		// Route the app
 		case 'route': 
 			return $app->route($options, $extras);
 
