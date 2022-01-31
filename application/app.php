@@ -1,8 +1,9 @@
 <?php
 
-function index($args = []) {
+function index($args = []) 
+{
 	global $_;
-	$result = [
+	$results = [
 		"OUTPUT" => '<div class="section" id="snippetSection">
 						<div class="container">
 							<div class="">
@@ -10,23 +11,71 @@ function index($args = []) {
 							</div>
 							<pre>
 								<code>
-					// Some code here
+								// Some code here
 								</code>
 							</pre>
 						</div>
-					</div> '
+					</div>'
 	];
-	return $result;
+	return $results;
 }
 
-function en ($args = []) {
+function user ($args = []) 
+{
+	$results = [
+		"JSON"  => json_encode(
+			[
+				"user" => [
+					"user" => 1
+				]
+			]
+		),
+		"ERROR" => "<:ERR/>"
+	];
+	return $results;
+}
+
+function checkKey($args = []) 
+{
+	return !(empty($_SERVER['HTTP_APIKEY']) || $_SERVER['HTTP_APIKEY'] != "ca300a3dff5f1bbbee3878b41126cb4f");
+}
+
+function noResource () 
+{
+	$results = [
+		"JSON"  => "",
+		"ERROR" => "<:NOMETHODORRESOURCE/>"
+	];
+	return $results;
+}
+
+function txn ($args = []) 
+{
+	$results = [
+		"JSON"  => json_encode(
+			[
+				"txn" => [
+					"id" => 1, 
+					"user" => 1,
+					"amount" => "$100"
+				]
+			]
+		),
+		"ERROR" => "<:ERR/>"
+	];
+	return $results;
+}
+
+function en ($args = []) 
+{
 	global $_;
-	$_("setLang: en");
+	$_("setLang: en.ini");
 	return index($args);
 }
 
-function es ($args = []) {
+function es ($args = [])
+{
 	global $_;
-	$_("setLang: es");
+	$_("setLang: es.ini");
 	return index($args);
 }

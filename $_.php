@@ -21,6 +21,7 @@
 *****************************************************************************************/
 
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 /**
@@ -334,7 +335,8 @@ class Database
 				  $port = 0, 
 				  $database = '', 
 				  $user = '', 
-				  $password = '';
+				  $password = '',
+				  $migrations = '';
 
 	/**
 	 * Establish a connection to the database
@@ -402,7 +404,7 @@ class Database
 	{
 		if (!empty($args)) {
 			$args = $this->sanitize($args);
-			$query = preg_replace_callback( '/\?/', function( $match) use( &$args) {
+			$query = preg_replace_callback( '/\?/', function($match) use( &$args) {
 				return "'" . array_shift($args) . "'";
 			}, $query);
 		}
@@ -426,6 +428,31 @@ class Database
 	{
 		return self::$driver->result($ret);
 	}
+
+	/**
+	 * Run the migrations in a SQL script to build the database 
+	 * @param $filename the file where the query is stored 
+	 */
+	public function migrate ($filename = '') 
+	{
+		if (!empty($filename)) 
+			$query = file_get_contents(FILES_BASE_PATH . $filename);
+		elseif (!empty(self::$migrations))
+			$query = file_get_contents(self::$migrations);
+		
+		if (empty($query))
+			return false;
+		
+		$lines = explode(";", $query);
+		foreach ($lines as $line) {
+			if (empty($line))
+				continue;
+
+			if (!$this->query(trim($line)))
+				return false;
+		}
+		return true;
+	}
 }
 
 /**
@@ -435,9 +462,17 @@ class Application
 {
 	protected static $config = [], 
 				     $url = [], 
+					 $default = "index",
+					 $error404 = "index",
+					 $httperrors = [],
+					 $enforce = "",
+					 $methods = [],
 				     $routes = [], 
-					 $includes = [],
-					 $enforce = "";
+					 $includes = [
+						 "EXCEPTIONS" => "",
+						 "FOLDERS"    => "",
+						 "VENDORS"    => ""	
+					 ];
 
     /**
      * Returns the configuration
@@ -454,7 +489,7 @@ class Application
 	 */
 	public function setConfig($filepath = '') 
 	{ 
-		$filepath = $filepath ? $filepath . '.json' : 'config.json';
+		$filepath = $filepath ? $filepath : 'config.json';
 					
 		self::$config = json_decode(file_get_contents($filepath), true);
 		
@@ -498,13 +533,21 @@ class Application
 					foreach (self::$config[$key] as $rKey => $rVal) {
 						switch (Utils::trimLower($rKey)) {
 							case 'default':
-								self::$routes['DEFAULT'] = Utils::trimLowerKeys($rVal);
+								self::$default = Utils::trimLowerKeys($rVal);
 								break;
 
-							case 'httperror':
-								self::$routes['HTTPERROR'] = Utils::trimLowerKeys($rVal);
+							case '404':
+								self::$error404 = Utils::trimLowerKeys($rVal);
 								break;
-		
+
+							case 'httperrors':
+								self::$httperrors = Utils::trimLowerKeys($rVal);
+								break;
+
+							case 'enforce':
+								self::$enforce = Utils::trimLowerKeys($rVal);
+								break;	
+			
 							default:
 								self::$routes[Utils::trimLower($rKey)] = Utils::trimLowerKeys($rVal);
 								break;
@@ -521,10 +564,7 @@ class Application
 								break;
 
 							case 'default_layout':  
-								if (!empty($_SESSION['LAYOUT_IN_USE']))
-									Template::$defaultLayout = $_SESSION['LAYOUT_IN_USE'];
-								else
-									Template::$defaultLayout = $tVal;
+								Template::$defaultLayout = $tVal;
 								break;
 
 							case 'language_path': 
@@ -532,10 +572,7 @@ class Application
 								break;
 
 							case 'default_language': 
-								if (!empty($_SESSION['LANGUAGE_IN_USE']))
-									Template::$defaultLanguage = $_SESSION['LANGUAGE_IN_USE'];
-								else
-									Template::$defaultLanguage = $tVal;
+								Template::$defaultLanguage = $tVal;
 								break;
 						}
 					}
@@ -563,6 +600,8 @@ class Application
 							case 'password':
 								Database::$password = $dbVal;
 								break;
+							case 'migrations':
+								Database::$migrations = $dbVal;
 						}
 					}
 					break;
@@ -598,9 +637,24 @@ class Application
 			}
 		}
 		
-		// if the main path is not set, lets set the default
-		if (!defined('FILES_BASE_PATH')) 
+		// if the website, main path, etc. are not set, lets set the default
+		if (!defined('WEBSITE'))
+			DEFINE ('WEBSITE', '/');
+		
+		if (!defined('FILES_BASE_PATH')) {
 			DEFINE ('FILES_BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/');
+			DEFINE ('FILES_RELATIVE_PATH', '/');
+		}
+
+		if (!defined('LAYOUT_PATH'))
+			DEFINE ('LAYOUT_PATH', 'layout/');
+	
+		if (!defined('LANGUAGE_PATH'))
+			DEFINE ('LANGUAGE_PATH', 'language/');
+			
+		// overwrite the default language using the session
+		if (!empty($_SESSION['LANGUAGE_IN_USE']))
+			Template::$defaultLanguage = $_SESSION['LANGUAGE_IN_USE'];
 	}
 	
 	/** 
@@ -663,8 +717,12 @@ class Application
 	 */
 	public function process ($action) {
 		// private area of the website
-		if (isset($action['enforce']))  
+		if (isset($action['enforce'])) 
 			self::$enforce = $action['enforce'];
+		
+		// set the default error 404
+		if (isset($action['404']))
+			self::$error404 = $action['404'];
 		
 		// set the layout
 		if (isset($action['layout'])) 
@@ -676,7 +734,11 @@ class Application
 		
 		// register any needed classes
 		if (isset($action['register']))	
-			self::$includes['FOLDERS'] = $action['register'];
+			self::$includes['FOLDERS'] = ";" . $action['register'];
+
+		// define the methods (GET, POST, etc.) that can be used in this path 
+		if (isset($action['methods']))
+			self::$methods = $action['methods'];
 	}
 	
 	/** 
@@ -689,8 +751,8 @@ class Application
 		if (!$urlpath && isset($_REQUEST['_url']))
 			$urlpath = $_REQUEST['_url'];
 
-		if (!empty(self::$routes['HTTPERROR']) && array_key_exists($urlpath, self::$routes['HTTPERROR'])) {
-			http_response_code(self::$routes['HTTPERROR'][$urlpath]);
+		if (!empty(self::$httperrors) && array_key_exists($urlpath, self::$httperrors)) {
+			http_response_code(self::$httperrors[$urlpath]);
 			die();
 		}
 
@@ -701,12 +763,12 @@ class Application
 					self::$url[] = $value;
 			}
 		}
-		
-		$args = array_merge($args, $_REQUEST);
+
+		$params = array_merge($args, $_REQUEST, ["json" => json_decode(file_get_contents('php://input'), true)]);
 
 		// if there is no _url put the default
 		if (!self::$url) {
-			$action = self::$routes['DEFAULT'] ?? "index";
+			$action = self::$default;
 			$this->process($action);
 		} 
 		else {
@@ -721,7 +783,7 @@ class Application
 					$index++;
 				}
 				else {
-					$action = self::$routes['404'] ?? "index";
+					$action = self::$error404;
 					break;
 				}
 			}
@@ -731,43 +793,44 @@ class Application
         if (is_array($action)) {
 			// get the arguments if any 
 			if (!empty($action['args'])) 
-				$args = array_merge($args, json_decode($action['args'], true));
+				$params = array_merge($params, json_decode($action['args'], true));
 
             // redirect to another url
             if (!empty($action['redirect'])) {
                 header ('Location: ' . $action['redirect']);
-                die ();
+                die();
             }
 
-            // preferred way when a class is called
-            elseif (!empty($action['method']) && !empty($action['class'])) {
+            // get the class to be used for the method call
+            if (!empty($action['class']))
                 $class = $action['class'];
-                $action = $action['method'];
-            }
 
-            // preferred way when the action is just a function
-            elseif (!empty($action['action']))
+            // get the function
+            if (!empty($action['action']))
                 $action = $action['action'];
 
             // there is something wrong here...
             else
-                $action = self::$routes['404'] ?? "index";
+				die('No action found!'); 
         }
 		
-		// call the function that enforces login
-		if (!empty(self::$enforce) && is_callable(self::$enforce)) 
-			call_user_func(self::$enforce, $args);
-		
+		// call the function that enforces login and check tha the method is allowed
+		if ((!empty(self::$enforce) && is_callable(self::$enforce) && !call_user_func(self::$enforce, $params)) ||
+			(!empty(self::$methods) && !in_array($_SERVER['REQUEST_METHOD'], self::$methods)) )  {
+			http_response_code(403);
+			die();
+		}
+
 		// lets call the main action inside a class
 		if (!empty($class) && is_callable([$c = new $class($args), $action])) 
-			return $c->$action($args);
+			return $c->$action($params);
 		
 		// lets call the main action as a function
 		elseif (!empty($action) && is_callable($action)) 
-			return call_user_func($action, $args); 
+			return call_user_func($action, $params);
 		
 		else 
-			die('No action method found!'); 
+			die('No action found!'); 
 	}
 }
 
@@ -777,7 +840,7 @@ class Application
 class Template
 {
 	public static $defaultLayout = '',
-				  $defaultLanguage = [];
+				  $defaultLanguage = '';
 				  
 	protected $fullLayout = '',
 			  $fullLanguage = [];
@@ -790,7 +853,7 @@ class Template
 	{
 		$filename = LAYOUT_PATH . ($layout ? $layout : self::$defaultLayout);
 
-		$this->fullLayout = $this->inject($filename . '.html');
+		$this->fullLayout = $this->inject($filename);
 
 		return $this->fullLayout;
 	}
@@ -809,9 +872,9 @@ class Template
  	 */
 	public function setLang ($language = '')
 	{
-		$filename = LANGUAGE_PATH . ($language ? $language : self::$defaultLanguage);
+		$filename = FILES_BASE_PATH . LANGUAGE_PATH . ($language ? $language : self::$defaultLanguage);
 
-		$allLines = file(FILES_BASE_PATH . $filename . '.ini');
+		$allLines = file($filename);
 		
 		$this->fullLanguage = [];
 		foreach ($allLines as $line) {
@@ -823,6 +886,8 @@ class Template
 				continue;
 			$this->fullLanguage[trim($keyValue[0])] = trim($keyValue[1]);
 		}
+
+		$_SESSION['LANGUAGE_IN_USE'] = $language;
 
 		return $this->fullLanguage;
 	}
@@ -861,8 +926,7 @@ class Template
 	protected function apply ($html, $allDefs, $clean = false) 
 	{
 		foreach ($allDefs as $name => $content) {
-			// this is escaping the $ in the string
-			$content = addcslashes($content, '\\$'); 
+			$content = addcslashes($content, '\\$'); // this is escaping the $ in the string
 			$html = preg_replace('/\<:'.$name.'\/\>/', $content, $html);
 			$html = preg_replace('/{{'.$name.'}}/', $content, $html);
 		}
@@ -905,6 +969,9 @@ class Template
  	 */
 	public function render ($results = [])
 	{
+		if (is_string($results)) 
+			return $results;
+
 		if (!$this->fullLayout)
 			$this->setLayout();
 		
@@ -1014,6 +1081,7 @@ class Email
 
 		// for debug only
 		// $mail->SMTPDebug = 3;
+		// $mail->SMTPDebug = SMTP::DEBUG_SERVER;  
 
 		$mail->isSMTP();
 		$mail->Host = self::$server;
@@ -1235,7 +1303,14 @@ $_ = function ($query = '', $options = [], $extras = '')
 		/*********************
 		 * Express Init & Run
 		 *********************/
-		
+		case 'init:':
+			$options = $query;
+
+		case 'init':
+			$app->setConfig();
+			$database->connect();
+			die ($database->migrate($options) ? "OK" : "KO");
+			
 		// run the app, automatic and simple
 		case 'run': 
 			$app->setConfig();
@@ -1243,8 +1318,7 @@ $_ = function ($query = '', $options = [], $extras = '')
 			$database->connect();
 			// if the router returned null pass an empty array to the render, 
 			// this avoids warnings from php 
-			echo $template->render($app->route() ?? []); 
-			break;
+			die ($template->render($app->route() ?? [])); 
 		
 		/*********************
 		 * APP ACTIONS
@@ -1332,6 +1406,13 @@ $_ = function ($query = '', $options = [], $extras = '')
 		case 'connect':
 			return $database->connect();
 		
+		// run the migrations
+		case 'migrations:':
+			$options = $query;
+
+		case 'migrations':
+			return $database->migrate($options);
+
 		// sanitize the values
 		case 'sanitize':
 			return $database->sanitize($options);
