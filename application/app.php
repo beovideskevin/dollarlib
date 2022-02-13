@@ -6,9 +6,9 @@ function index($args = [])
 
 	$results = [
 		"EXAMPLE" => 'DollarLib',
-		"NOTES"   => 'DollarLib es un framework de php muy ingenuo. Lo uso solamente para mis propios sitios web. Puedes ver el código completo en github: 
+		"NOTES"   => 'Dollarlib is a simple php lib, or a very naive and flexible framework. I just use it for my own websites. Check the code at github: 
 					  <a href="https://github.com/beovideskevin/dollarlib" target="_blank">https://github.com/beovideskevin/dollarlib</a>.',
-		"OUTPUT"  => "<h4>README.md</h4><pre><code>".Utils::htmlOut(file_get_contents(FILES_BASE_PATH . "/../README.md")) ."</code></pre>" 
+		"OUTPUT"  => "<h4>README.md</h4><pre><code>".file_get_contents(FILES_BASE_PATH . "/../README.md") ."</code></pre>" 
 	];
 	return $results;
 }

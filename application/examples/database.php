@@ -6,7 +6,7 @@ config.json
 {
 	"WEBSITE": "localhost",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
+	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/application/",
 
 	"REGISTER":
 	{
@@ -21,9 +21,9 @@ config.json
 
 	"TEMPLATE": 
 	{
-		"LANGUAGE_PATH": "application/language/",
+		"LANGUAGE_PATH": "language/",
 		"DEFAULT_LANGUAGE": "es.ini",
-		"LAYOUT_PATH": "application/layout/",
+		"LAYOUT_PATH": "layout/",
 		"DEFAULT_LAYOUT": "main.html"
 	},
 
