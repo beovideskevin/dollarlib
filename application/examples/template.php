@@ -47,13 +47,6 @@ function checkTemplate($args = [])
 	$results = $_("getlayout");
 	$pre .= "<b>getlayout</b>\n" . htmlspecialchars($results) .  "\n\n";
 
-	// Set another layout
-	$results = $_("setlayout: json.html");
-	$pre .= "<b>setlayout: json.html</b>\n" . htmlspecialchars($results) .  "\n\n";
-
-	$results = $_("getlayout");
-	$pre .= "<b>getlayout</b>\n" . htmlspecialchars($results) .  "\n\n";
-
 	// Get all the language
 	$results = $_("getlang");
 	$pre .= "<b>getlang</b>\n" . print_r($results, true) . "\n\n";
