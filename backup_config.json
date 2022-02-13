@@ -1,0 +1,36 @@
+{
+	"WEBSITE": "localhost",
+
+	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/application/",
+
+	"DATABASE": 
+	{
+		"ADAPTER": "mysql",
+		"PORT": "3306",
+		"HOST": "mysql",
+		"DATABASE": "eldile5_db",
+		"USER": "eldile5_user",
+		"PASSWORD": "t52eXq047r89",
+		"MIGRATIONS": "migrations.sql"
+	},
+
+	"TEMPLATE": 
+	{
+		"LANGUAGE_PATH": "language/",
+		"DEFAULT_LANGUAGE": "en.ini",
+		"LAYOUT_PATH": "layout/",
+		"DEFAULT_LAYOUT": "main.html"
+	},
+
+	"REGISTER":
+	{
+		"EXCEPTIONS": "",
+		"FOLDERS": "/",
+		"VENDORs": ""
+	},
+
+	"ROUTES":
+	{
+		"default": "index"
+	}
+}

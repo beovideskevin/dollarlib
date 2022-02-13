@@ -8,7 +8,7 @@
 	
 	<!-- Document Title
 	============================================= -->
-	<title><:TITLE/> <:SEO_TITLE/></title>
+	<title><:TITLE/></title>
 	
 	<!-- Mobile Specific Metas
 	============================================= -->
@@ -16,7 +16,7 @@
 	
 	<!-- Favicon
 	============================================= -->
-	<link rel="icon" type="image/png" href="/application/assets/images/favicon.png">
+	<link rel="icon" type="image/png" href="/dollarlib.eldiletante.com/application/assets/images/favicon.png">
 
 	<!-- FONT
 	============================================= -->
@@ -24,133 +24,64 @@
   
 	<!-- Stylesheets
 	============================================= -->
-	<link rel="stylesheet" href="/application/assets/css/normalize.min.css">
-	<link rel="stylesheet" href="/application/assets/css/skeleton.min.css">
+	<link rel="stylesheet" href="/dollarlib.eldiletante.com/application/assets/css/normalize.min.css">
+	<link rel="stylesheet" href="/dollarlib.eldiletante.com/application/assets/css/skeleton.min.css">
 
 	<!-- Custom Stylesheet
 	============================================= -->
 	<style>
-		/* Navbar */
-		.navbar {
-			position: fixed;
-			top: 0;
-			left: 0;
-		}
-		.navbar + .docs-section {
-			border-top-width: 0;
-		}
-		.navbar, .navbar-spacer {
-			display: block;
-			width: 100%;
-			height: 6.5rem;
-			background: #fff;
-			z-index: 99;
-			border-top: 1px solid #eee;
-			border-bottom: 1px solid #eee;
-		}
-		.navbar > .container {
-			width: 100%;
-		}
-		.navbar-list {
-			list-style: none;
-			margin-bottom: 0;
-		}
-		.navbar-item {
-			position: relative;
-			float: left;
-			margin-bottom: 0;
-		}
-		.navbar-link {
-			text-transform: uppercase;
-			font-size: 11px;
-			font-weight: 600;
-			letter-spacing: .2rem;
-			margin-right: 35px;
-			text-decoration: none;
-			line-height: 6.5rem;
-			color: #222;
-		}
-
 		/* Sections */
 		.section {
-    		padding: 7rem 0 7rem;
-		}
-
-		.section-heading, .section-description {
-			margin-bottom: 1.2rem;
+    		padding: 2rem 0 2rem;
 		}
 
 		/* Github */
 		.github {
-			background-image: url('/application/assets/images/bg.png');
+			background-image: url('/dollarlib.eldiletante.com/application/assets/images/bg.png');
 			background-size: cover;
 			color: #fff;
 			text-align: center;
 		}
+
 		.github .section-description {
 			margin-bottom: 4rem;
 		}
 
-		/* main title */
-		#mainTitle {
-			color: #33C3F0;
-			font-weight: bold;
-		}
-
-		#okTitle {
-			color: #33C3F0;
-			font-weight: bold;
-		}
-
-		#errorTitle {
-			color: #f00;
-			font-weight: bold;
-		}
-
-		<:MAIN_STYLE/>
+		<:STYLES/>
 	</style>
-	
 </head>
-
 <body>
 	
 	<!-- Primary Page Layout
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
-	<div class="container">
-		<div class="navbar-spacer"></div>
-		<nav class="navbar">
-			<div class="container">
-				<ul class="navbar-list">
-					<li class="navbar-item"><a class="navbar-link" href="/"><:HOMEMENU/></a></li>
-					<li class="navbar-item"><a class="navbar-link" href="en"><:ENMENU/></a></li>
-					<li class="navbar-item"><a class="navbar-link" href="es"><:ESMENU/></a></li>
-				</ul>
-			</div>
-		</nav>
-	</div>
-
 	<div class="section github">
 		<div class="container">
 			<div class="row">
-				<div class="column category">
-					<img class="u-max-full-width" src="/application/assets/images/my2cents.png">
+				<div class="column">
+					<img class="u-max-full-width" src="/dollarlib.eldiletante.com/application/assets/images/dollar.png">
 				</div>
-				<h4><:HEADER/></h4>
-				<p><:SUB_HEADER/> https://github.com/beovideskevin/dollarlib</p>
 			</div>
 		</div>
 	</div>
 
-	<:OUTPUT/>
+	<div class="section" id="snippetSection">
+		<div class="container">
+			<div class="row">
+				<h3 id="mainTitle"><:EXAMPLE/></h3>
+			</div>
+			<div class="row">
+				<p><:NOTES/></p>
+			</div>
+			<div class="row">
+				<:OUTPUT/>
+			</div>
+		</div>
+	</div>
 	
 	<!-- External JavaScripts
 	============================================= -->
-	<script src="/application/assets/js/jquery-3.6.0.min.js"></script>
+	<script src="/dollarlib.eldiletante.com/application/assets/js/jquery-3.6.0.min.js"></script>
 
-	<!-- Custom Javascript
-	============================================= -->
-	<script>
-		<:MAIN_SCRIPT/>
-	</script>
+	<:SCRIPT/>
 </body>
 </html>
