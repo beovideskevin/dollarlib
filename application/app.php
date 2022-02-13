@@ -1,5 +1,6 @@
 <?php
 
+// The default entry point is the function index
 function index($args = []) 
 {
 	global $_;
