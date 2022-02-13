@@ -38,21 +38,21 @@ function checkTemplate($args = [])
 
 	// At this point the template has not being set
 	$results = $_("getlayout");
-	$pre = "<b>getlayout</b>\n" . Utils::htmlOut($results) .  "\n\n";
+	$pre = "<b>getlayout</b>\n" . htmlspecialchars($results) .  "\n\n";
 
 	// Set the layout
 	$results = $_("setlayout", "email.html");
-	$pre .= "<b>setlayout, email.html</b>\n" . Utils::htmlOut($results) .  "\n\n";
+	$pre .= "<b>setlayout, email.html</b>\n" . htmlspecialchars($results) .  "\n\n";
 
 	$results = $_("getlayout");
-	$pre .= "<b>getlayout</b>\n" . Utils::htmlOut($results) .  "\n\n";
+	$pre .= "<b>getlayout</b>\n" . htmlspecialchars($results) .  "\n\n";
 
 	// Set another layout
 	$results = $_("setlayout: json.html");
-	$pre .= "<b>setlayout: json.html</b>\n" . Utils::htmlOut($results) .  "\n\n";
+	$pre .= "<b>setlayout: json.html</b>\n" . htmlspecialchars($results) .  "\n\n";
 
 	$results = $_("getlayout");
-	$pre .= "<b>getlayout</b>\n" . Utils::htmlOut($results) .  "\n\n";
+	$pre .= "<b>getlayout</b>\n" . htmlspecialchars($results) .  "\n\n";
 
 	// Get all the language
 	$results = $_("getlang");
@@ -87,14 +87,14 @@ function checkTemplate($args = [])
 
 	// Lets try importing something and using the language
 	$results = $_("inject: /examples/includes/example.html", ["TEXT" => "say hello"]);
-	$pre .= "<b>inject with language</b>\n" . Utils::htmlOut($results) . "\n\n";
+	$pre .= "<b>inject with language</b>\n" . htmlspecialchars($results) . "\n\n";
 
 	// This is only used when you didn't started the app with run, mostly is not used 
 	$results = $_("render", [
 			"JSON"  => '{"value":"this is a json"}',
 			"ERROR" => 'just some error'
 		]);
-	$pre .= "<b>render with language</b>\n" . Utils::htmlOut($results) . "\n\n";
+	$pre .= "<b>render with language</b>\n" . htmlspecialchars($results) . "\n\n";
 
 	// Lets reset the layout and language this or it is not going to work 
 	$_("setlayout", "main.html");
