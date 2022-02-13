@@ -725,12 +725,12 @@ class Application
 {
 	protected static $config = [], 
 				     $url = [], 
-					 $action = "",
+					 $action,
 					 $default = "index",
-					 $error404 = "index",
+					 $error404,
 					 $httperrors = [],
-					 $redirect = "",
-					 $enforce = "",
+					 $redirect,
+					 $enforce,
 				     $routes = [], 
 					 $includes = [
 						 "EXCEPTIONS" => "",
@@ -1009,7 +1009,7 @@ class Application
 	 * @param $urlpath the path to map as a function or method call
 	 * @param $args the arguments passed to the method or function
 	 */
-	public function route ($urlpath = '') 
+	public function route ($urlpath = '', $args = []) 
 	{
 		if (!$urlpath && isset($_REQUEST['_url']))
 			$urlpath = $_REQUEST['_url'];
@@ -1041,7 +1041,7 @@ class Application
 				}
 				else {
 					// the url is not an index in the routes, so 404
-					self::$action = self::$error404;
+					self::$action = self::$error404 ?? self::$default; 
 					break;
 				}
 			}
@@ -1058,15 +1058,23 @@ class Application
 			header ('Location: ' . self::$redirect);
 			die();
 		}
+
+		$args = array_merge($args, $_REQUEST);
 		
 		// if the result is still an array, get the action function
-        if (is_array(self::$action) && !empty(self::$action['action']))
-            self::$action = self::$action['action'];
+        if (is_array(self::$action)) {
+			if (!empty(self::$action['args'])) 
+				$args = array_merge($args, json_decode(self::$action['args'], true));
+			
+			if (!empty(self::$action['action']))
+				self::$action = self::$action['action'];
+		}
+        
 
 		// lets call the main action as a function
 		if (is_string(self::$action) && is_callable(self::$action)) {
 			// finally, call the target function 
-			return call_user_func(self::$action, $_REQUEST);
+			return call_user_func(self::$action, $args);
 		}
 		else {
 			http_response_code(500);

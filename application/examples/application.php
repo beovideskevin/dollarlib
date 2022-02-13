@@ -32,6 +32,10 @@ config.json
 			"language": "es.ini",
 			"action": "checkLayout"
 		},
+		"args": {
+			"action": "checkArgs",
+			"args": "{\"key\": \"value\"}"
+		},
 		"notgood": {
 			"redirect": "checkRedirect"
 		},
@@ -59,6 +63,7 @@ Routes to test
 	/admin/evenmore
 	/logout
 	/layout
+	/args
 	/notgood
 	/404
 	/error301
@@ -190,5 +195,15 @@ function checkLayout($args = [])
 {
 	return [
 		"OUTPUT"  => 'This is the email layout. Not much to look at :)'
+	];
+}
+
+function checkArgs($args = [])
+{
+	return [
+		"EXAMPLE" => "Application",
+		"NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
+						the other files and routing.",
+		"OUTPUT"  => '<pre><code>' . print_r($args, true) . '</code></pre>'
 	];
 }
