@@ -187,7 +187,7 @@ class PostgreSQLAdapter implements DbAdapter
 		self::$link = pg_connect("host={$server} port={$port} dbname={$database} user={$user} password={$pass}");
 		
 		if (!self::$link) 
-			throw new Exception('PostgreSQLAdapter: Could not connect!');
+			throw new \Exception('PostgreSQLAdapter: Could not connect!');
 	}
 
 	/**
@@ -296,7 +296,7 @@ class MySQLAdapter implements DbAdapter
 		self::$link = new \mysqli($server, $user, $pass, $database, $port);
 
 		if (!self::$link) 
-			throw new Exception('MySQLAdapter: Could not connect!');
+			throw new \Exception('MySQLAdapter: Could not connect!');
 	}
 
 	/**
