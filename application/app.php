@@ -13,4 +13,3 @@ function index($args = [])
 	];
 	return $results;
 }
-

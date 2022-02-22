@@ -20,6 +20,8 @@
 
 *****************************************************************************************/
 
+namespace DollarLib;
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
@@ -291,7 +293,7 @@ class MySQLAdapter implements DbAdapter
  	 */ 
 	public function __construct($server, $port, $user, $pass, $database)
 	{
-		self::$link = new mysqli($server, $user, $pass, $database, $port);
+		self::$link = new \mysqli($server, $user, $pass, $database, $port);
 
 		if (!self::$link) 
 			throw new Exception('MySQLAdapter: Could not connect!');
