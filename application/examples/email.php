@@ -36,6 +36,8 @@ config.json
 
 */
 
+use DollarLib\Utils;
+
 function checkEmail($args = []) 
 {
 	global $_;

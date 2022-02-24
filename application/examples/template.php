@@ -32,6 +32,8 @@ config.json
 
 */
 
+use DollarLib\Utils;
+
 function checkTemplate($args = []) 
 {
 	global $_;

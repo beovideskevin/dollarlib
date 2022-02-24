@@ -67,6 +67,8 @@ config.json
 
 */
 
+use DollarLib\Schemas;
+
 function checkSchemas($args = []) 
 {
 	global $_;

@@ -254,11 +254,11 @@ class PostgreSQLAdapter implements DbAdapter
 				return $rows;
 
 			case 'schema':
-				return pg_fetch_object(self::$result, 0, "Schemas", [$schema]);
+				return pg_fetch_object(self::$result, 0, "DollarLib\Schemas", [$schema]);
 				
 			case 'schemas':
 				$num = pg_numrows(self::$result);
-				for ($count = 0; $count < $num && $obj = pg_fetch_object(self::$result, $count, "Schemas", [$schema]); $count++)
+				for ($count = 0; $count < $num && $obj = pg_fetch_object(self::$result, $count, "DollarLib\Schemas", [$schema]); $count++)
 					$rows[] = $obj;
 
 				return $rows;
@@ -361,10 +361,10 @@ class MySQLAdapter implements DbAdapter
 				return $rows;
 
 			case 'schema':
-				return self::$result->fetch_object("Schemas", [$schema]);
+				return self::$result->fetch_object("DollarLib\Schemas", [$schema]);
 
 			case 'schemas':
-				while ($obj = self::$result->fetch_object("Schemas", [$schema])) 
+				while ($obj = self::$result->fetch_object("DollarLib\Schemas", [$schema])) 
 					$rows[] = $obj;
 
 				return $rows;

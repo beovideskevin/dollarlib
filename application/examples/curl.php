@@ -30,6 +30,8 @@ config.json
 
 */
 
+use DollarLib\Curl;
+
 // Useful snippets of code, you do not have to use all those options: 
 function checkCurl() 
 {
