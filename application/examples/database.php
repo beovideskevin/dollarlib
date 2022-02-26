@@ -6,24 +6,13 @@ config.json
 {
 	"WEBSITE": "localhost",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/application/",
-
-	"REGISTER":
-	{
-		"EXCEPTIONS": "",
-		"FOLDERS": "examples/"
-	},
-
-	"ROUTES":
-	{
-		"default": "checkDB"
-	},
+	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
 	"TEMPLATE": 
 	{
-		"LANGUAGE_PATH": "language/",
+		"LANGUAGE_PATH": "application/language/",
 		"DEFAULT_LANGUAGE": "es.ini",
-		"LAYOUT_PATH": "layout/",
+		"LAYOUT_PATH": "application/layout/",
 		"DEFAULT_LAYOUT": "main.html"
 	},
 
@@ -36,6 +25,17 @@ config.json
 		"USER": "",
 		"PASSWORD": "",
 		"MIGRATIONS": "migrations.sql"
+	},
+
+	"REGISTER":
+	{
+		"EXCEPTIONS": "",
+		"FOLDERS": "application/examples/"
+	},
+
+	"ROUTES":
+	{
+		"default": "checkDB"
 	}
 }
 

@@ -6,31 +6,41 @@ config.json
 {
 	"WEBSITE": "localhost",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/application/",
+	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
 	"REGISTER":
 	{
 		"EXCEPTIONS": "",
-		"FOLDERS": "examples/",
+		"FOLDERS": "application/examples/",
 		"VENDORS": "vendor/"
-	},
-
-	"ROUTES":
-	{
-		"default": "checkEmail"
 	},
 
 	"TEMPLATE": 
 	{
-		"LANGUAGE_PATH": "language/",
+		"LANGUAGE_PATH": "application/language/",
 		"DEFAULT_LANGUAGE": "es.ini",
-		"LAYOUT_PATH": "layout/",
+		"LAYOUT_PATH": "application/layout/",
 		"DEFAULT_LAYOUT": "main.html"
 	},
 
 	"recaptcha": {
 		"secretKey": "",
 		"siteKey": ""
+	},
+
+	"EMAIL": {
+		"SYSTEM": "",
+		"FROM": "",
+		"SERVER": "",
+		"PORT": "",
+		"USER": "",
+		"PASSWORD": "",
+		"LAYOUT": "email"
+	},
+
+	"ROUTES":
+	{
+		"default": "checkEmail"
 	}
 }
 
@@ -50,51 +60,42 @@ function checkEmail($args = [])
 	// In order to use recaptcha you are going to need this script included in the page 
 	$js = '<script src="https://www.google.com/recaptcha/api.js"></script>';
 
-	
 	/**
 	 * FULL EXAMPLE
 	 */ 
 	
+	// $emailMsg = "Email was NOT sent!"; // Set the error message
 	// You want to send an email using the email template, set it
 	// Since this method is mostly used like an ajax call it is ok to set the layout 
-	// I left the email layout just for reference, it is not used because we are presenting the main.html
 	// $_("setlayout: email.html");
-
-	// Set the error message
-	$emailMsg = "Email was NOT sent!";
-
-	// Get the config of the captcha
-	$recaptcha = $_("getConfig: recaptcha"); 
-
-	// Check the field of the form
-	if (!empty($args['g-recaptcha-response']) && !empty($args['email']) && 
-        !empty($args['name']) && !empty($args['message']) && empty($args['hidden'])) 
-	{
-		// Check with google if captcha worked
-        $output = json_decode(
-			file_get_contents(
-				"https://www.google.com/recaptcha/api/siteverify?secret=" . $recaptcha['secretKey'] . "&response=" . $args['g-recaptcha-response']
-			), 
-			true
-		);
-        if (isset($output['success']) && $output['success'] == true && 
-			// Send the email
-			$_(
-				"email: contact@eldiletante.com", 
-				[
-					"subject"   => "Email from eldiletante.com", 
-					"emailfrom" => $args['email'],
-					"namefrom"  => $args['name']
-				], 
-				[
-					"OUTPUT" => $args['message'] . "<br>Origin: eldiletante.com" 
-				]
-			)) 
-		{
-			// If we got this far the email was sent
-			$emailMsg = "Email sent!";
-        }
-    }
+	// $emailConfig = $_("getConfig: EMAIL");  // Get the config of the captcha
+	// $recaptcha = $_("getConfig: recaptcha");  // Get the config of the captcha
+	// if (!empty($args['g-recaptcha-response']) && !empty($args['email']) && 
+    //     !empty($args['name']) && !empty($args['message']) && empty($args['hidden'])) // Check the fields of the form and the captcha
+	// {
+    //     $output = json_decode(
+	// 		file_get_contents(
+	// 			"https://www.google.com/recaptcha/api/siteverify?secret=" . $recaptcha['secretKey'] . "&response=" . $args['g-recaptcha-response']
+	// 		), 
+	// 		true
+	// 	);
+    //     if (isset($output['success']) && $output['success'] == true &&  // Check with google if captcha worked
+				// $result = $_(											   // and send the email
+				// 	"email: " . $emailConfig['SYSTEM'],
+				// 	[
+				// 		"subject"   => "Email from yourwebsite.com",  
+				// 		"emailfrom" => $args['email'],
+				// 		"namefrom"  => $args['name']
+				// 	], 
+				// 	[
+				// 		"OUTPUT" => $args['message'] . "<br>Origin: yourwebsite.com"
+				// 	]
+				// )
+	// 		)
+	// 	{
+	// 		$emailMsg = "Email sent!"; // If we got this far the email was sent
+    //     }
+    // }
 
 	return [
 		"EXAMPLE" => "Email",

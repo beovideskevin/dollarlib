@@ -6,12 +6,12 @@ config.json
 {
 	"WEBSITE": "localhost",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/application/",
+	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
 	"REGISTER":
 	{
 		"EXCEPTIONS": "",
-		"FOLDERS": "examples/"
+		"FOLDERS": "application/examples/"
 	},
 
 	"ROUTES":
@@ -21,9 +21,9 @@ config.json
 
 	"TEMPLATE": 
 	{
-		"LANGUAGE_PATH": "language/",
+		"LANGUAGE_PATH": "application/language/",
 		"DEFAULT_LANGUAGE": "es.ini",
-		"LAYOUT_PATH": "layout/",
+		"LAYOUT_PATH": "application/layout/",
 		"DEFAULT_LAYOUT": "main.html"
 	},
 
@@ -67,7 +67,7 @@ config.json
 
 */
 
-use DollarLib\Schemas;
+use DollarLib\Schema;
 
 function checkSchemas($args = []) 
 {
@@ -85,7 +85,7 @@ function checkSchemas($args = [])
 	$user = $_("schema: select * from user", [], "user");
 	$pre .= "<b>Get one user:</b> \n" . print_r($user, true) . "\n\n";
 	
-	$pepe = new Schemas("user"); // This is how you create a new user
+	$pepe = new Schema("user"); // This is how you create a new user
 	// You can access the properties one by one, or just assign them in bulk with an array
 	$pepe->assign([
 			"name" => "pepe"
@@ -99,7 +99,7 @@ function checkSchemas($args = [])
 
 	// In this case we are loading the user 1 as a schema, you have to be careful because if the user
 	// loads the address as a schema too, you could en up creating a loop
-	$address = new Schemas("address");
+	$address = new Schema("address");
 	$address->load(1); // This will get the address id == 1 from the database
 	$pre .= "<b>Load address:</b> \n" . print_r($address, true) . "\n\n";
 
@@ -122,7 +122,7 @@ function checkSchemas($args = [])
 	$pre .= "<b>After reload:</b> \n" . print_r($phone, true) . "\n\n";
 
 	return [
-		"EXAMPLE" => "Schemas",
+		"EXAMPLE" => "Schema",
 		"NOTES"   => "What I tried to do here is a class that works as a model, by providing relations and some methods like save and assign. 
 		 			  Since I don't pretend to create a full MVC the functionality provided is very basic.",
 		"OUTPUT"     => '<pre><code>' . $pre . '</code></pre>'

@@ -6,12 +6,12 @@ config.json
 {
 	"WEBSITE": "localhost",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/application/",
+	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
 	"REGISTER":
 	{
 		"EXCEPTIONS": "",
-		"FOLDERS": "examples/"
+		"FOLDERS": "application/examples/"
 	},
 
 	"ROUTES":
@@ -23,9 +23,9 @@ config.json
 
 	"TEMPLATE": 
 	{
-		"LANGUAGE_PATH": "language/",
+		"LANGUAGE_PATH": "application/language/",
 		"DEFAULT_LANGUAGE": "en.ini",
-		"LAYOUT_PATH": "layout/",
+		"LAYOUT_PATH": "application/layout/",
 		"DEFAULT_LAYOUT": "main.html"
 	}
 }

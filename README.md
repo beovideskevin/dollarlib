@@ -32,32 +32,32 @@ config.json
 {
 	"WEBSITE": "localhost",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/application/",
+	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
 	"DATABASE": 
 	{
 		"ADAPTER": "mysql",
 		"PORT": "3306",
 		"HOST": "mysql",
-		"DATABASE": "",
-		"USER": "",
-		"PASSWORD": "",
+		"DATABASE": "your_database",
+		"USER": "your_username",
+		"PASSWORD": "your_password",
 		"MIGRATIONS": "migrations.sql"
 	},
 
 	"TEMPLATE": 
 	{
-		"LANGUAGE_PATH": "language/",
+		"LANGUAGE_PATH": "application/language/",
 		"DEFAULT_LANGUAGE": "en.ini",
-		"LAYOUT_PATH": "layout/",
+		"LAYOUT_PATH": "application/layout/",
 		"DEFAULT_LAYOUT": "main.html"
 	},
 
 	"REGISTER":
 	{
 		"EXCEPTIONS": "",
-		"FOLDERS": "/",
-		"VENDORs": ""
+		"FOLDERS": "application/",
+		"VENDORS": "vendor/"
 	},
 
 	"ROUTES":
@@ -69,9 +69,9 @@ config.json
 
 Remember to set these in the json or the connection to the database will fail:
 ``` 
-	"DATABASE": "",
-	"USER": "",
-	"PASSWORD": "",
+	"DATABASE": "your_database",
+	"USER": "your_username",
+	"PASSWORD": "your_password",
 ```
 
 migrations.sql
@@ -151,3 +151,5 @@ COMMIT;
 
 In order to run the examples copy the commented code at the top of each file into config.json. 
 What passes for documentation is inside the files in the form of comments. 
+
+You might also want to install phpmailer using composer.

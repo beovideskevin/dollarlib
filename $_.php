@@ -254,11 +254,11 @@ class PostgreSQLAdapter implements DbAdapter
 				return $rows;
 
 			case 'schema':
-				return pg_fetch_object(self::$result, 0, "DollarLib\Schemas", [$schema]);
+				return pg_fetch_object(self::$result, 0, "DollarLib\Schema", [$schema]);
 				
 			case 'schemas':
 				$num = pg_numrows(self::$result);
-				for ($count = 0; $count < $num && $obj = pg_fetch_object(self::$result, $count, "DollarLib\Schemas", [$schema]); $count++)
+				for ($count = 0; $count < $num && $obj = pg_fetch_object(self::$result, $count, "DollarLib\Schema", [$schema]); $count++)
 					$rows[] = $obj;
 
 				return $rows;
@@ -361,10 +361,10 @@ class MySQLAdapter implements DbAdapter
 				return $rows;
 
 			case 'schema':
-				return self::$result->fetch_object("DollarLib\Schemas", [$schema]);
+				return self::$result->fetch_object("DollarLib\Schema", [$schema]);
 
 			case 'schemas':
-				while ($obj = self::$result->fetch_object("DollarLib\Schemas", [$schema])) 
+				while ($obj = self::$result->fetch_object("DollarLib\Schema", [$schema])) 
 					$rows[] = $obj;
 
 				return $rows;
@@ -547,7 +547,7 @@ class Database
 /**
  * This class is a very light and naive interpretation of what a Model is in other MVCs 
  */
-class Schemas
+class Schema
 {
 	public static $_schemas = [];
 	protected $_table_name = "",
@@ -870,7 +870,7 @@ class Application
 				
 				// Get the array of tables and relations used in the Schemas class 
 				case 'schemas': 
-					Schemas::$_schemas = self::$config[$key];
+					Schema::$_schemas = self::$config[$key];
 					break;
 
 				// SMTP email configuration	
@@ -920,7 +920,7 @@ class Application
 			DEFINE ('LANGUAGE_PATH', 'language/');
 			
 		// overwrite the default language using the session
-		if ($_SESSION['LANGUAGE_IN_USE'])
+		if (!empty($_SESSION['LANGUAGE_IN_USE']))
 			Template::$defaultLanguage = $_SESSION['LANGUAGE_IN_USE'];
 	}
 	
