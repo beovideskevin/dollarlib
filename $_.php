@@ -1139,6 +1139,8 @@ class Template
 		}
 
 		$_SESSION['LANGUAGE_IN_USE'] = $language ? $language : self::$defaultLanguage;
+		$this->fullLanguage['FILES_BASE_PATH'] = FILES_BASE_PATH;
+		$this->fullLanguage['FILES_RELATIVE_PATH'] = FILES_RELATIVE_PATH;
 
 		return $this->fullLanguage;
 	}
