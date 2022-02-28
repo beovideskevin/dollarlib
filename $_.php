@@ -1138,9 +1138,7 @@ class Template
 			$this->fullLanguage[trim($keyValue[0])] = trim($keyValue[1]);
 		}
 
-		$_SESSION['LANGUAGE_IN_USE'] = $language;
-		$this->fullLanguage['FILES_BASE_PATH'] = FILES_BASE_PATH;
-		$this->fullLanguage['FILES_RELATIVE_PATH'] = FILES_RELATIVE_PATH;
+		$_SESSION['LANGUAGE_IN_USE'] = $language ? $language : self::$defaultLanguage;
 
 		return $this->fullLanguage;
 	}
