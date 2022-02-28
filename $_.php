@@ -1231,8 +1231,6 @@ class Template
 		if (!$this->fullLanguage) 
 			$this->setLang();
 
-		print_r($this->fullLanguage);
-		
 		// Apply the results first to the layout 
 		$tmpHtml = $this->apply($this->fullLayout, $results);
 
