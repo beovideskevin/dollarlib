@@ -51,7 +51,8 @@ config.json
 		"404": "check404",
 		"httperrors": {
 			"error301" : "301"
-		}
+		},
+		"checkClass": "myClass::index"
 	}
 }
 
@@ -67,6 +68,7 @@ Routes to test
 	/notgood
 	/404
 	/error301
+	/checkClass
 
 */
 
@@ -154,7 +156,7 @@ function check404($args = [])
 	return [
 		"EXAMPLE" => "Application",
 		"NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
-						the other files and routing.",
+					  the other files and routing.",
 		"OUTPUT"  => '404'
 	];
 }
@@ -164,7 +166,7 @@ function checkAdmin($args = [])
 	return [
 		"EXAMPLE" => "Application",
 		"NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
-						the other files and routing.",
+					  the other files and routing.",
 		"OUTPUT"  => 'Admin page'
 	];
 }
@@ -174,7 +176,7 @@ function checkMore($args = [])
 	return [
 		"EXAMPLE" => "Application",
 		"NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
-						the other files and routing.",
+					  the other files and routing.",
 		"OUTPUT"  => 'More'
 	];
 }
@@ -184,7 +186,7 @@ function checkEvenMore($args = [])
 	return [
 		"EXAMPLE" => "Application",
 		"NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
-						the other files and routing.",
+					  the other files and routing.",
 		"OUTPUT"  => 'Even More'
 	];
 }
@@ -201,7 +203,18 @@ function checkArgs($args = [])
 	return [
 		"EXAMPLE" => "Application",
 		"NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
-						the other files and routing.",
+					  the other files and routing.",
 		"OUTPUT"  => '<pre><code>' . print_r($args, true) . '</code></pre>'
 	];
+}
+
+class myClass {
+	static function index($args = []) {
+		return [
+			"EXAMPLE" => "Application",
+			"NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
+						  the other files and routing.",
+			"OUTPUT"  => 'The index method was called'
+		];
+	}
 }
