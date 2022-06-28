@@ -331,7 +331,7 @@ class MySQLAdapter implements DbAdapter
 	public function query ($query)  
 	{
 		self::$result = self::$link->query($query);
-		
+
 		return self::$result;
 	}
 	
@@ -364,9 +364,11 @@ class MySQLAdapter implements DbAdapter
 				return self::$result->fetch_object("DollarLib\Schema", [$schema]);
 
 			case 'schemas':
-				while ($obj = self::$result->fetch_object("DollarLib\Schema", [$schema])) 
+				while ($row = self::$result->fetch_array(MYSQLI_ASSOC)) {
+					$obj = new Schema($schema);
+					$obj->assign($row);
 					$rows[] = $obj;
-
+				}	
 				return $rows;
 
 			case 'assoc':
@@ -528,7 +530,7 @@ class Database
 			$query = file_get_contents(FILES_BASE_PATH . $filename);
 		elseif (self::$migrations)
 			$query = file_get_contents(self::$migrations);
-		
+
 		if (!$query)
 			return false;
 		
@@ -596,7 +598,7 @@ class Schema
 		if (!empty(self::$_schemas[$tableName]['relations'])) {
 			foreach (self::$_schemas[$tableName]['relations'] as $name => $relation) {
 				// Check if we have the values required for the query
-				if (empty($relation)) 
+				if (empty($relation) || (!empty($relation[1]) && empty($this->{$relation[1]}))) 
 					continue;
 					
 				// Get the schema objects and assign the array to the _table_relations property
@@ -745,7 +747,16 @@ class Application
      */
     public function getConfig($index = "")
     {
-        $result = $index && isset(self::$config[$index]) ? self::$config[$index] : self::$config;
+		if ($index && is_array($index)) {
+			$result = [];
+			foreach ($index as $i) {
+				if (isset(self::$config[$i])) 
+					$result[$i] = self::$config[$i];
+			}
+		}
+		else { 
+			$result = $index && isset(self::$config[$index]) ? self::$config[$index] : self::$config;
+		}
         return $result;
     }
 
@@ -761,6 +772,14 @@ class Application
 		
 		if (!self::$config)
 			die ('No configuration file or error while parsing it!');
+
+		// Get the environment and set it as root index in the config array 
+		if (isset(self::$config['ENV'])) {
+			$env = self::$config['ENV'];
+			if (empty(self::$config[$env]))
+				die ('No configuration for this environment!');
+			self::$config = self::$config[$env];
+		}
 		
 		foreach (self::$config as $key => $value) {
 			switch (Utils::trimLower($key)) {
@@ -1538,7 +1557,8 @@ $_ = function ($query = '', $options = [], $extras = '')
 	static $app = NULL, 
 		   $database = NULL, 
 		   $template = NULL, 
-		   $email = NULL;
+		   $email = NULL,
+		   $curl = NULL;
 
 	$app = $app ?? new Application();
 	$database = $database ?? new Database();

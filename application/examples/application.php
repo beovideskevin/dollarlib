@@ -81,7 +81,9 @@ function checkApplication($args = [])
 	$pre = "<b>getconfig</b>\n" . print_r($results, true) . "\n";
 	$results = $_("getconfig: WEBSITE");
 	$pre .= "<b>getconfig</b>\n" . print_r($results, true) . "\n\n";
-
+	$results = $_("getconfig", ["WEBSITE", "FILES_BASE_PATH"]);
+	$pre .= "<b>getconfig</b>\n" . print_r($results, true) . "\n\n";
+	
 	/**
 	 * This is how I start a website
 	 */

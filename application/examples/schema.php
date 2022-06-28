@@ -78,13 +78,17 @@ function checkSchemas($args = [])
 	$_("migrations");
 
 	// Using "schemas:" you get back an array of objects of type user
-	$users = $_("schemas: select * from user", [], "user");
+	$users = $_("schemas: select * from user order by id desc", [], "user");
 	$pre = "<b>Get all users:</b> \n" . print_r($users, true) . "\n\n";
 
 	// Using "schema:" you just get the first user object returned by the query
 	$user = $_("schema: select * from user", [], "user");
 	$pre .= "<b>Get one user:</b> \n" . print_r($user, true) . "\n\n";
 	
+	// Using "schema:" you just get the user by id 
+	$user = $_("schema: select * from user where id = ?", [2], "user");
+	$pre .= "<b>Get user 2:</b> \n" . print_r($user, true) . "\n\n";
+
 	$pepe = new Schema("user"); // This is how you create a new user
 	// You can access the properties one by one, or just assign them in bulk with an array
 	$pepe->assign([
