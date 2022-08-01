@@ -70,24 +70,23 @@ function checkTemplate($args = [])
 	$pre .= "<b>setlang: es.ini</b>\n" . print_r($results, true) . "\n\n";
 
 	// Notice that we do not have inject without : because we need the last argument for the clean up flag
-	$results = $_("inject: /examples/includes/example.html");
+	$results = $_("inject: application/examples/includes/example.html");
 	$pre .= "<b>htmlOut</b>\n" . Utils::htmlOut($results, true) . "\n\n";
 
 	// This is for JS
-	$results = $_("inject: /examples/includes/example.js");
+	$results = $_("inject: application/examples/includes/example.js");
 	$pre .= "<b>jsOut</b>\n" . Utils::jsOut($results) . "\n\n";
 
 	// This is for links, it could be useful
 	$pre .= "<b>linkOut</b>\n" . Utils::linkOut("<a href='www.google.com'>this link</a>") . "\n\n";
 
 	// Lets try importing something and using the language
-	$results = $_("inject: /examples/includes/example.html", ["TEXT" => "say hello"]);
+	$results = $_("inject: application/examples/includes/example.html", ["TEXT" => "say hello"]);
 	$pre .= "<b>inject with language</b>\n" . htmlspecialchars($results) . "\n\n";
 
 	// This is only used when you didn't started the app with run, mostly is not used 
 	$results = $_("render", [
-			"JSON"  => '{"value":"this is a json"}',
-			"ERROR" => 'just some error'
+			"OUTPUT"  => '{"value":"this is a json"}'
 		]);
 	$pre .= "<b>render with language</b>\n" . htmlspecialchars($results) . "\n\n";
 
@@ -96,7 +95,7 @@ function checkTemplate($args = [])
 	$_("setlang", "en.ini");
 
 	return [
-		"STYLES"  => $_("inject: /examples/includes/example.css"), // this will make every p look bold
+		"STYLES"  => $_("inject: application/examples/includes/example.css"), // this will make every p look bold
 		"EXAMPLE" => "Template",
 		"NOTES"   => "The idea of the whole lib is to create the HTML completely inside the PHP code. This class 
 					  basically manages the layout of the web, inserting the language when render is called.",

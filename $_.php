@@ -163,7 +163,7 @@ interface DbAdapter
 	/**
 	 * Return the results
 	 */
-	public function result ($ret, $schema);
+	public function result ($ret);
 }
 
 /**
@@ -172,7 +172,7 @@ interface DbAdapter
 class PostgreSQLAdapter implements DbAdapter
 {
 	protected static $link = NULL, 
-				     $result = NULL; 
+				     			 $result = NULL; 
 
 	/**
 	 * Creates the connection to the database
@@ -228,10 +228,9 @@ class PostgreSQLAdapter implements DbAdapter
 	
 	/**
 	 * Return the result of a query
-	 * @param $ret the type of result: insertid; single; obj; objs; schema; schemas; assoc or assoclist 
-	 * @param $schema the schema to use 
+	 * @param $ret the type of result: insertid; single; obj; objs; assoc or assoclist 
  	 */ 
-	public function result ($ret = '', $schema = '')
+	public function result ($ret = '')
 	{
 		$rows = [];
 		switch ($ret) {
@@ -253,20 +252,10 @@ class PostgreSQLAdapter implements DbAdapter
 
 				return $rows;
 
-			case 'schema':
-				return pg_fetch_object(self::$result, 0, "DollarLib\Schema", [$schema]);
-				
-			case 'schemas':
-				$num = pg_numrows(self::$result);
-				for ($count = 0; $count < $num && $obj = pg_fetch_object(self::$result, $count, "DollarLib\Schema", [$schema]); $count++)
-					$rows[] = $obj;
+			case 'assoc':
+        return pg_fetch_assoc(self::$result);
 
-				return $rows;
-
-            case 'assoc':
-                return pg_fetch_assoc(self::$result);
-
-            case 'assoclist':
+      case 'assoclist':
 				while($row = pg_fetch_assoc(self::$result))
 					$rows[] = $row;
 
@@ -281,7 +270,7 @@ class PostgreSQLAdapter implements DbAdapter
 class MySQLAdapter implements DbAdapter
 {
 	protected static $link = NULL, 
-				     $result = NULL; 
+				     			 $result = NULL; 
 	
 	/**
 	 * Connect to the database
@@ -337,10 +326,9 @@ class MySQLAdapter implements DbAdapter
 	
 	/**
 	 * Return the result of a query
-	 * @param $ret the type of result: insertid; single; obj; objs; schema; schemas; assoc or assoclist
-	 * @param $schema the schema to use 
+	 * @param $ret the type of result: insertid; single; obj; objs; assoc or assoclist
  	 */ 
-	public function result ($ret = '', $schema = '')
+	public function result ($ret = '')
 	{
 		$rows = [];
 		switch ($ret) {
@@ -360,27 +348,15 @@ class MySQLAdapter implements DbAdapter
 
 				return $rows;
 
-			case 'schema':
-				return self::$result->fetch_object("DollarLib\Schema", [$schema]);
-
-			case 'schemas':
-				while ($row = self::$result->fetch_array(MYSQLI_ASSOC)) {
-					$obj = new Schema($schema);
-					$obj->assign($row);
-					$rows[] = $obj;
-				}	
-				return $rows;
-
 			case 'assoc':
-                return self::$result->fetch_assoc();
+        return self::$result->fetch_assoc();
 
-            case 'assoclist':
-                while($row = self::$result->fetch_array(MYSQLI_ASSOC))
-                    $rows[] = $row;
+      case 'assoclist':
+				while($row = self::$result->fetch_array(MYSQLI_ASSOC))
+						$rows[] = $row;
 
-                return $rows;
-
-        }
+				return $rows;
+    }
 	}
 }
 
@@ -390,17 +366,17 @@ class MySQLAdapter implements DbAdapter
 class Database
 {
 	private static $driver = NULL, 
-				   $adapterList = [
-					   'mysql',
-					   'postgresql'
-				   ];
+								 $adapterList = [
+								 	 'mysql',
+									 'postgresql'
+								 ];
 	public static $adapter = '', 
-				  $host = '', 
-				  $port = 0, 
-				  $database = '', 
-				  $user = '', 
-				  $password = '',
-				  $migrations = '';
+								$host = '', 
+								$port = 0, 
+								$database = '', 
+								$user = '', 
+								$password = '',
+								$migrations = '';
 
 	/**
 	 * Establish a connection to the database
@@ -475,9 +451,8 @@ class Database
 	 * @param $query the query to use
 	 * @param $args the arguments to use in the query
 	 * @param $ret the return type
-	 * @param $schema the schema to use
  	 */ 
-	public function query ($query, $args = [], $ret = '', $schema = '') 
+	public function query ($query, $args = [], $ret = '') 
 	{
 		if (!self::$driver)
 			return false;
@@ -496,8 +471,7 @@ class Database
 		}
 		elseif ($ret) {
 			$ret = Utils::trimLower($ret);
-			$schema = Utils::trimLower($schema);
-			return self::$driver->result($ret, $schema);
+			return self::$driver->result($ret);
 		}
 			
 		return true;
@@ -507,14 +481,13 @@ class Database
 	 * Return the result of a query
 	 * @param $ret the type of result: insertid; single; obj; assoclist or assoc (this is the default)
  	 */ 
-	public function result ($ret = '', $schema = '') 
+	public function result ($ret = '') 
 	{
 		if (!self::$driver)
 			return false;
 
 		$ret = Utils::trimLower($ret);
-		$schema = Utils::trimLower($schema);
-		return self::$driver->result($ret, $schema);
+		return self::$driver->result($ret);
 	}
 
 	/**
@@ -547,217 +520,42 @@ class Database
 }
 
 /**
- * This class is a very light and naive interpretation of what a Model is in other MVCs 
- */
-class Schema
-{
-	public static $_schemas = [];
-	protected $_table_name = "",
-		      $_table_id = "",
-			  $_table_validation = "",
-			  $_skip_fields = [
-				'_table_name', '_table_id', 
-				'_table_validation', '_skip_fields'
-			  ];
-
-	/**
-	 * The constructor of the class
-	 * @param $table the table used for the schema 
-	 */
-	public function __construct($table)
-	{
-		global $_;
-
-		if ($table && !empty(self::$_schemas[$table])) {
-			$this->_table_name = $table;
-
-			// Get the id and set it in the skip fields 
-			if (!empty(self::$_schemas[$table]['id'])) {
-				$this->_table_id = self::$_schemas[$table]['id'];
-				$this->_skip_fields[] = $this->_table_id;
-			}
-
-			// Get the validation method
-			$this->_table_validation = self::$_schemas[$table]['validation'] ?? '';
-			
-			// Load relations if any exists
-			$this->relations();
-		}
-	}
-
-	/**
-	 * Loads the relations from the schemas
-	 */
-	private function relations()
-	{
-		global $_;
-
-		// Lets assign this values to normal variables just to be comfortable
-		$tableName = $this->_table_name;
-
-		if (!empty(self::$_schemas[$tableName]['relations'])) {
-			foreach (self::$_schemas[$tableName]['relations'] as $name => $relation) {
-				// Check if we have the values required for the query
-				if (empty($relation) || (!empty($relation[1]) && empty($this->{$relation[1]}))) 
-					continue;
-					
-				// Get the schema objects and assign the array to the _table_relations property
-				$this->$name = $_($relation[0], [$this->{$relation[1]} ?? null], $relation[2] ?? '');
-				
-				// We need to skip this property when inserting and updating
-				if (!in_array($name, $this->_skip_fields))
-					$this->_skip_fields[] = $name;
-			}
-		}
-	}
-
-	/**
-	 * Assign the properties to the object, if the property does not exist it will be created
-	 * @param $properties the properties to be assigned
-	 */
-	public function assign($properties = []) 
-	{
-		// Try and assign the values to the object 
-		if ($properties) {
-			foreach ($properties as $key => $value)
-				$this->$key = $value;
-		}
-	}
-
-	/**
-	 * Gets the the record from the database, if $id is not passed it syncs the current object with its record 
-	 * @param $id the id off the record to load
-	 */
-	public function load($id = null) 
-	{
-		global $_;
-
-		// Lets assign this values to normal variables just to be comfortable
-		$tableName = $this->_table_name;
-		$idName = $this->_table_id;
-
-		// If there is no an id we can not query the database
-		if (!$tableName || !$idName || (!$this->$idName && !$id))
-			return false;
-
-		// Query the database and get everything from this table
-		$properties = $_("*: $tableName WHERE $idName = ?", [$id ?? $this->$idName]);
-		if (!$properties)
-			return false;
-		
-		// Fill the properties of the object
-		$this->assign($properties[0]);
-		$this->relations();
-
-		return $properties;
-	}
-
-	/**
-	 * Insert or update the record of the object
-	 * @param $properties if you want to assign values before saving
-	 */
-	public function save($properties = []) 
-	{
-		global $_;
-
-		// Lets assign this values to normal variables just to be comfortable
-		$tableName = $this->_table_name;
-		$idName = $this->_table_id;
-
-		// If there is no table return false
-		if (!$tableName) {
-			return false;
-		}
-
-		// Assign the values 
-		$this->assign($properties);
-
-		// Validate the values of the object
-		if ($this->_table_validation && is_callable($this->_table_validation) &&  
-			!call_user_func($this->_table_validation, $this))
-			return false;
-
-		// Get the properties from this object
-		$recordProps = array_diff_key(
-			get_object_vars($this), 
-			array_flip($this->_skip_fields)
-		);
-		
-		// If the id is sent, this is an update
-		if ($idName && $this->$idName) {
-			$query = "";
-			$values = [];
-			foreach ($recordProps as $key => $value) {
-				$query .= $query ? "," : "";
-				$query .= $key . "=?";
-				$values[] = $value;
-
-			}
-			$result = $_(": UPDATE {$tableName} SET {$query} WHERE {$idName} = '{$this->$idName}'", $values);
-		}
-		// If the id is not set, this is an insert
-		else {
-			$insertKey = "";
-			$insertValue = "";
-			$values = [];
-			foreach ($recordProps as $key => $value) {
-				$insertKey .= $insertKey ? "," : "";
-				$insertValue .= $insertValue ? "," : "";
-				$insertKey .= $key;
-				$insertValue .= "?";
-				$values[] = $value; 
-			}
-			$query = "insertid: INSERT INTO {$tableName} ({$insertKey}) VALUES ({$insertValue})";
-			
-			if (Utils::trimLower(Database::$adapter) == "postgresql" && $idName) 
-				$query .= " RETURNING {$idName}";
-			
-			$result = $_($query, $values);
-			
-			if ($result && $idName) 
-				$this->$idName = $result;
-		}
-
-		return $result;
-	}
-}
-
-/**
  * This class acts like a sort of a controller or router
  */
 class Application
 {
 	protected static $config = [], 
-				     $url = [], 
-					 $action,
-					 $default = "index",
-					 $error404,
-					 $httperrors = [],
-					 $redirect,
-					 $enforce,
-				     $routes = [], 
-					 $includes = [
-						 "EXCEPTIONS" => "",
-						 "FOLDERS"    => "",
-						 "VENDORS"    => ""	
-					 ];
+				     			 $url = [], 
+									 $action,
+									 $default = "index",
+									 $error404,
+									 $httperrors = [],
+									 $redirect,
+									 $enforce,
+				     			 $routes = [], 
+									 $includes = [
+										 "EXCEPTIONS" => "",
+										 "FOLDERS"    => "",
+										 "VENDORS"    => ""	
+									 ];
 
     /**
      * Returns the configuration
      */
     public function getConfig($index = "")
     {
-		if ($index && is_array($index)) {
-			$result = [];
-			foreach ($index as $i) {
-				if (isset(self::$config[$i])) 
-					$result[$i] = self::$config[$i];
+			if ($index && is_array($index)) {
+				$result = [];
+				foreach ($index as $i) {
+					if (isset(self::$config[$i])) 
+						$result[$i] = self::$config[$i];
+				}
 			}
-		}
-		else { 
-			$result = $index && isset(self::$config[$index]) ? self::$config[$index] : self::$config;
-		}
-        return $result;
+			else { 
+				$result = $index && isset(self::$config[$index]) ? self::$config[$index] : self::$config;
+			}
+
+			return $result;
     }
 
 	/** 
@@ -886,11 +684,6 @@ class Application
 						}
 					}
 					break;
-				
-				// Get the array of tables and relations used in the Schemas class 
-				case 'schemas': 
-					Schema::$_schemas = self::$config[$key];
-					break;
 
 				// SMTP email configuration	
 				case 'email': 
@@ -955,7 +748,7 @@ class Application
 		if (!$folder) {
 			// Include the vendors
 			if (!empty(self::$includes['VENDORS']) && is_dir(FILES_BASE_PATH . self::$includes['VENDORS']) && 
-				file_exists(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php')) 
+					file_exists(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php')) 
 			{
 				require_once(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php'); 
 			}
@@ -1110,10 +903,10 @@ class Application
 class Template
 {
 	public static $defaultLayout = '',
-				  $defaultLanguage = '';
+				  			$defaultLanguage = '';
 				  
 	protected $fullLayout = '',
-			  $fullLanguage = [];
+			  		$fullLanguage = [];
 	
 	/**
 	 * Set the layout
@@ -1265,12 +1058,12 @@ class Template
 class Email 
 {
 	public static $system = '', 
-				  $from = '', 
-				  $server = '', 
-				  $port = '', 
-				  $user = '', 
-				  $password = '',
-				  $layout = '';
+								$from = '', 
+								$server = '', 
+								$port = '', 
+								$user = '', 
+								$password = '',
+								$layout = '';
 
 	/**
 	 * The main method of the class, use this one to send emails
@@ -1427,7 +1220,7 @@ class Email
 class Curl 
 {
 	private $handle = null, 
-			$lastUrl = '';
+					$lastUrl = '';
 
 	/**
 	 * Method to send a call over the internet
@@ -1555,10 +1348,10 @@ class Curl
 $_ = function ($query = '', $options = [], $extras = '') 
 {
 	static $app = NULL, 
-		   $database = NULL, 
-		   $template = NULL, 
-		   $email = NULL,
-		   $curl = NULL;
+				 $database = NULL, 
+				 $template = NULL, 
+				 $email = NULL,
+				 $curl = NULL;
 
 	$app = $app ?? new Application();
 	$database = $database ?? new Database();
@@ -1597,12 +1390,12 @@ $_ = function ($query = '', $options = [], $extras = '')
 			return $app->setConfig($options);
 
 		// Get a specific index in the configuration
-        case 'getconfig:':
-            $options = $query;
+		case 'getconfig:':
+				$options = $query;
 
-        // Get the configuration
-        case 'getconfig':
-            return $app->getConfig($options);
+		// Get the configuration
+		case 'getconfig':
+				return $app->getConfig($options);
 
 		// Register other dependencies and libs
 		case 'register:':
@@ -1682,11 +1475,6 @@ $_ = function ($query = '', $options = [], $extras = '')
 		// sanitize the values
 		case 'sanitize':
 			return $database->sanitize($options);
-		
-		// run a literal query and overwrites the default return type with the value 
-		case 'schema:':
-		case 'schemas:':
-			$schema = $extras ? $extras : $options;
 
 		case 'insertid:': // When using postgresql add RETURNING id to the query
 		case 'single:':
@@ -1699,7 +1487,7 @@ $_ = function ($query = '', $options = [], $extras = '')
 		// run a literal query 
 		case 'query:':
 		case ':':
-			return $database->query($query, $options, $extras, $schema ?? '');
+			return $database->query($query, $options, $extras);
 
 		// A couple of short hand notations
 		case 'count:':
