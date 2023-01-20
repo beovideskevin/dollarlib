@@ -24,7 +24,7 @@ config.json
 
 	"ROUTES":
 	{
-		"default": "checkCurl"
+		"_default": "checkCurl"
 	}
 }
 

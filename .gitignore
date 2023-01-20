@@ -4,6 +4,3 @@
 /tests
 /phpunit.xml
 /vendor
-/composer.phar
-/composer.json
-/composer.lock

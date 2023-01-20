@@ -8,6 +8,14 @@ config.json
 
 	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
+    "TEMPLATE":
+	{
+		"LANGUAGE_PATH": "application/language/",
+		"DEFAULT_LANGUAGE": "en.ini",
+		"LAYOUT_PATH": "application/layout/",
+		"DEFAULT_LAYOUT": "main.html"
+	},
+
 	"REGISTER":
 	{
 		"EXCEPTIONS": "",
@@ -16,17 +24,9 @@ config.json
 
 	"ROUTES":
 	{
-		"default": "checkTemplate",
+		"_default": "checkTemplate",
 		"es": "checkES",
 		"en": "checkEN"
-	},
-
-	"TEMPLATE": 
-	{
-		"LANGUAGE_PATH": "application/language/",
-		"DEFAULT_LANGUAGE": "en.ini",
-		"LAYOUT_PATH": "application/layout/",
-		"DEFAULT_LAYOUT": "main.html"
 	}
 }
 

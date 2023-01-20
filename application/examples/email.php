@@ -40,7 +40,7 @@ config.json
 
 	"ROUTES":
 	{
-		"default": "checkEmail"
+		"_default": "checkEmail"
 	}
 }
 

@@ -24,35 +24,44 @@ config.json
 
 	"ROUTES":
 	{
-		"default": "checkApplication",
+		"_default": "checkApplication",
 		"login": "login",
 		"logout": "logout",
 		"admin": {
-			"enforce": "checkLogin",
-			"action": "checkAdmin",
+			"_enforce": "checkLogin",
+			"_call": "checkAdmin",
 			"more": "checkMore",
 			"evenMore": {
-				"action": "checkEvenMore"
+				"_call": "checkEvenMore"
 			}
 		},
 		"layout": {
-			"layout": "email.html",
-			"language": "es.ini",
-			"action": "checkLayout"
+			"_layout": "email.html",
+			"_language": "es.ini",
+			"_call": "checkLayout"
+		},
+		"urlargs/:gallery": {
+			"_call": "checkUrlArgs",
 		},
 		"args": {
-			"action": "checkArgs",
-			"args": "{\"key\": \"value\"}"
+			"_call": "checkArgs",
+			"_args": "{\"key\": \"value\"}"
 		},
 		"notgood": {
-			"redirect": "checkRedirect"
+			"_redirect": "checkRedirect"
 		},
 		"checkRedirect": "checkRedirect",
-		"404": "check404",
-		"httperrors": {
+		"_404": "check404",
+		"_httperrors": {
 			"error301" : "301"
 		},
-		"checkClass": "myClass::index"
+		"checkClass": "myClass::index",
+        "api": {
+				"_get": "getMethod",
+				"_post":  "postMethod",
+				"_put":  "putMethod",
+				"_delete":  "deleteMethod"
+			}
 	}
 }
 
@@ -64,12 +73,14 @@ Routes to test
 	/admin/evenmore
 	/logout
 	/layout
+    /urlargs/:gallery
 	/args
 	/notgood
 	/404
 	/error301
 	/checkClass
-
+    GET, POST, PUT, DELETE:
+    /api
 */
 
 function checkApplication($args = [])
@@ -200,6 +211,15 @@ function checkLayout($args = [])
 	];
 }
 
+function checkUrlArgs($args = []) {
+    return [
+        "EXAMPLE" => "Application",
+        "NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
+					  the other files and routing.",
+        "OUTPUT"  => '<pre><code>' . print_r($args, true) . '</code></pre>'
+    ];
+}
+
 function checkArgs($args = [])
 {
 	return [
@@ -219,4 +239,40 @@ class myClass {
 			"OUTPUT"  => 'The index method was called'
 		];
 	}
+}
+
+function getMethod($args = []) {
+    return [
+        "EXAMPLE" => "Application",
+        "NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
+					  the other files and routing.",
+        "OUTPUT"  => 'GET: <pre><code>' . print_r($args, true) . '</code></pre>'
+    ];
+}
+
+function postMethod($args = []) {
+    return [
+        "EXAMPLE" => "Application",
+        "NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
+					  the other files and routing.",
+        "OUTPUT"  => 'POST: <pre><code>' . print_r($args, true) . '</code></pre>'
+    ];
+}
+
+function putMethod($args = []) {
+    return [
+        "EXAMPLE" => "Application",
+        "NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
+					  the other files and routing.",
+        "OUTPUT"  => 'PUT: <pre><code>' . print_r($args, true) . '</code></pre>'
+    ];
+}
+
+function deteleMethod($args = []) {
+    return [
+        "EXAMPLE" => "Application",
+        "NOTES"   => "This class would be a controller if the lib was an MVC. It takes care of loading the configuration, including 
+					  the other files and routing.",
+        "OUTPUT"  => 'DELETE: <pre><code>' . print_r($args, true) . '</code></pre>'
+    ];
 }

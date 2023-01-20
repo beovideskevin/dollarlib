@@ -35,7 +35,7 @@ config.json
 
 	"ROUTES":
 	{
-		"default": "checkDB"
+		"_default": "checkDB"
 	}
 }
 

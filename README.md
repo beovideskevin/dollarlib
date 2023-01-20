@@ -3,6 +3,15 @@
 Dollarlib is a simple php lib, or a very naive and flexible framework. 
 I created this lib to build my new media art <a href="https://eldiletante.com/">Gallery</a>
 
+The basic ideas behind this lib are:
+- simple way of building website form templates
+- built all the HTML from inside the php (no HTML and PHP mixed files) 
+- provide simple way of doing language change
+- simple routing using functions and enforce the user authentication
+- make querrying the database simple
+- make easy to send emails and do curl
+- simple registration of classes and helper functions
+
 In order to test you are going to need three files:
 
 .htaccess
@@ -153,3 +162,7 @@ In order to run the examples copy the commented code at the top of each file int
 What passes for documentation is inside the files in the form of comments. 
 
 You might also want to install phpmailer using composer.
+
+TO DO
+- [ ] Add redis
+- [ ] Add mongoDb
