@@ -1,20 +1,22 @@
 # Dollarlib
 
-Dollarlib is a simple php lib, or a very naive and flexible framework. 
-I created this lib to build my new media art <a href="https://eldiletante.com/">Gallery</a>
+Dollarlib is a simple php lib, or a very naive and flexible framework.
+I created this lib to build my [new media art gallery](https://eldiletante.com/)
 
 The basic ideas behind this lib are:
+
 - simple way of building website form templates
-- built all the HTML from inside the php (no HTML and PHP mixed files) 
+- built all the HTML from inside the php (no HTML and PHP mixed files)
 - provide simple way of doing language change
 - simple routing using functions and enforce the user authentication
-- make querrying the database simple
+- make querying the database simple
 - make easy to send emails and do curl
 - simple registration of classes and helper functions
 
 In order to test you are going to need three files:
 
 .htaccess
+
 ```
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -24,66 +26,69 @@ In order to test you are going to need three files:
 </IfModule>
 
 <Files "config.json">
-	Order Allow,Deny
-	Deny from all
+    Order Allow,Deny
+    Deny from all
 </Files>
 
 <Files "migrations.sql">
-	Order Allow,Deny
-	Deny from all
+    Order Allow,Deny
+    Deny from all
 </Files>
 
 Options -Indexes
 ```
 
 config.json
+
 ```
 {
-	"WEBSITE": "localhost",
+    "WEBSITE": "localhost",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
+    "FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
-	"DATABASE": 
-	{
-		"ADAPTER": "mysql",
-		"PORT": "3306",
-		"HOST": "mysql",
-		"DATABASE": "your_database",
-		"USER": "your_username",
-		"PASSWORD": "your_password",
-		"MIGRATIONS": "migrations.sql"
-	},
+    "DATABASE": 
+    {
+        "ADAPTER": "mysql",
+        "PORT": "3306",
+        "HOST": "mysql",
+        "DATABASE": "your_database",
+        "USER": "your_username",
+        "PASSWORD": "your_password",
+        "MIGRATIONS": "migrations.sql"
+    },
 
-	"TEMPLATE": 
-	{
-		"LANGUAGE_PATH": "application/language/",
-		"DEFAULT_LANGUAGE": "en.ini",
-		"LAYOUT_PATH": "application/layout/",
-		"DEFAULT_LAYOUT": "main.html"
-	},
+    "TEMPLATE": 
+    {
+        "LANGUAGE_PATH": "application/language/",
+        "DEFAULT_LANGUAGE": "en.ini",
+        "LAYOUT_PATH": "application/layout/",
+        "DEFAULT_LAYOUT": "main.html"
+    },
 
-	"REGISTER":
-	{
-		"EXCEPTIONS": "",
-		"FOLDERS": "application/",
-		"VENDORS": "vendor/"
-	},
+    "REGISTER":
+    {
+        "EXCEPTIONS": "",
+        "FOLDERS": "application/",
+        "VENDORS": "vendor/"
+    },
 
-	"ROUTES":
-	{
-		"default": "index"
-	}
+    "ROUTES":
+    {
+        "default": "index"
+    }
 }
 ```
 
 Remember to set these in the json or the connection to the database will fail:
-``` 
-	"DATABASE": "your_database",
-	"USER": "your_username",
-	"PASSWORD": "your_password",
+
+```
+    "DATABASE": "your_database",
+    "USER": "your_username",
+    "PASSWORD": "your_password",
 ```
 
 migrations.sql
+
 ```
 --
 -- Basic structure to test migrations, database access, schemas, etc.
@@ -158,11 +163,14 @@ INSERT INTO `phone` (`number`) VALUES ('786 859 5198');
 COMMIT;
 ```
 
-In order to run the examples copy the commented code at the top of each file into config.json. 
-What passes for documentation is inside the files in the form of comments. 
+In order to run the examples copy the commented code at the top of each file into config.json.
+What passes for documentation is inside the files in the form of comments.
 
-You might also want to install phpmailer using composer.
+You might also want to install PHPMailer (using composer) if you want to take full advantage of the email class.
 
 TO DO
-- [ ] Add redis
-- [ ] Add mongoDb
+
+- [ ] Add cli examples
+- [ ] Check application examples for api requests and url arguments
+- [ ] Update migrations.sql file for the examples, remove tables that you don't need anymore
+- [ ] Git and clone it in the server, then in the server update for all the websites, stop using ftp to sync

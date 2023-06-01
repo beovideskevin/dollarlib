@@ -9,11 +9,11 @@
  *
  * DollarLib is free software: you can redistribute it and/or modify it under the terms
  * of the GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or    (at your option) any later version.
+ * either version 3 of the License, or (at your option) any later version.
  *
  * DollarLib is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE.  See the GNU General Public License for more details.
+ * PURPOSE. See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with DollarLib. If not, see <http://www.gnu.org/licenses/>.
@@ -423,6 +423,41 @@ class Database
     }
 
     /**
+     * Check the the arguments for the query are the correct data type
+     * @param $args the array of type=>value to be check
+     */
+    public function checkTypes($args = []) 
+    {
+        if (!$args || !is_array($args)) {
+            return false;
+        }
+
+        foreach ($args as $key => $value) {
+            switch (Utils::trimLower($key)) {
+                case "any":
+                    if (!is_scalar($value))
+                        return false;
+                    break;
+                case "number":
+                    if (!is_int($value) && !is_float($value))
+                        return false;
+                    break;
+                case "string":
+                    if (!is_string($value))
+                        return false;
+                    break;
+                case "boolean":
+                case "bool": 
+                    if (!is_bool($value))
+                        return false;
+                    break;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Clean the argument, sanitize it
      * @param $var query or array to sanitize
      */
@@ -455,9 +490,13 @@ class Database
             return false;
 
         if ($args) {
+            if (!$this->checkTypes($args)) {
+                error_log('WOW (query): ' . print_r($args, true));
+                return false;
+            }
             $args = $this->sanitize($args);
             $query = preg_replace_callback('/\?/', function ($match) use (&$args) {
-                return array_shift($args);
+                return "'" . array_shift($args) . "'";
             }, $query);
         }
 
@@ -465,7 +504,8 @@ class Database
             error_log('WOW (query): ' . $query);
 
             return false;
-        } elseif ($ret) {
+        } 
+        elseif ($ret) {
             $ret = Utils::trimLower($ret);
             return self::$driver->result($ret);
         }
@@ -601,51 +641,14 @@ class Application
                     break;
 
                 // the main path
-                case 'files_base_path':
-                    DEFINE('FILES_BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . $value);
+                case 'files_path':
+                    DEFINE('FILES_ABSOLUTE_PATH', $_SERVER['DOCUMENT_ROOT'] . $value);
                     DEFINE('FILES_RELATIVE_PATH', $value);
                     break;
 
-                // the path for the classes to include
-                case 'register':
-                    foreach (self::$config[$key] as $regKey => $regVal) {
-                        switch (Utils::trimLower($regKey)) {
-                            case 'exceptions':
-                                self::$includes['EXCEPTIONS'] = $regVal;
-                                break;
-
-                            case 'folders':
-                                self::$includes['FOLDERS'] = $regVal;
-                                break;
-
-                            case 'vendors':
-                                self::$includes['VENDORS'] = $regVal;
-                                break;
-                        }
-                    }
-                    break;
-
-                // set the routes
-                case 'routes':
-                    foreach (self::$config[$key] as $rKey => $rVal) {
-                        switch (Utils::trimLower($rKey)) {
-                            case '_default':
-                                self::$default = Utils::trimLowerKeys($rVal);
-                                break;
-
-                            case '_404':
-                                self::$error404 = Utils::trimLowerKeys($rVal);
-                                break;
-
-                            case '_httperrors':
-                                self::$httperrors = Utils::trimLowerKeys($rVal);
-                                break;
-
-                            default:
-                                self::$routes[Utils::trimLower($rKey)] = Utils::trimLowerKeys($rVal);
-                                break;
-                        }
-                    }
+                // the main path
+                case 'assets_path':
+                    DEFINE('ASSETS_BASE_PATH', $value);
                     break;
 
                 // set the default template and language
@@ -727,6 +730,62 @@ class Application
                         }
                     }
                     break;
+
+                // the path for the classes to include
+                case 'register':
+                    foreach (self::$config[$key] as $regKey => $regVal) {
+                        switch (Utils::trimLower($regKey)) {
+                            case 'exceptions':
+                                self::$includes['EXCEPTIONS'] = $regVal;
+                                break;
+
+                            case 'folders':
+                                self::$includes['FOLDERS'] = $regVal;
+                                break;
+
+                            case 'vendors':
+                                self::$includes['VENDORS'] = $regVal;
+                                break;
+                        }
+                    }
+                    break;
+
+                // set the routes
+                case 'routes':
+                    foreach (self::$config[$key] as $rKey => $rVal) {
+                        switch (Utils::trimLower($rKey)) {
+                            case '_default':
+                                self::$default = Utils::trimLowerKeys($rVal);
+                                break;
+
+                            case '_404':
+                                self::$error404 = Utils::trimLowerKeys($rVal);
+                                break;
+
+                            case '_httperrors':
+                                self::$httperrors = Utils::trimLowerKeys($rVal);
+                                break;
+
+                            default:
+                                self::$routes[Utils::trimLower($rKey)] = Utils::trimLowerKeys($rVal);
+                                break;
+                        }
+                    }
+                    break;
+                    
+                case 'cli': 
+                    foreach (self::$config[$key] as $rKey => $rVal) {
+                        switch (Utils::trimLower($rKey)) {
+                            case '_help':
+                                Cli::$help = Utils::trimLowerKeys($rVal);
+                                break;
+
+                            default:
+                                Cli::$actions[Utils::trimLower($rKey)] = Utils::trimLowerKeys($rVal);
+                                break;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -734,10 +793,13 @@ class Application
         if (!defined('WEBSITE'))
             DEFINE('WEBSITE', '/');
 
-        if (!defined('FILES_BASE_PATH')) {
-            DEFINE('FILES_BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/');
+        if (!defined('FILES_ABSOLUTE_PATH')) {
+            DEFINE('FILES_ABSOLUTE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/');
             DEFINE('FILES_RELATIVE_PATH', '/');
         }
+
+        if (!defined('ASSETS_BASE_PATH'))
+            DEFINE('ASSETS_BASE_PATH', '/');
 
         if (!defined('LAYOUT_PATH'))
             DEFINE('LAYOUT_PATH', 'layout/');
@@ -814,7 +876,7 @@ class Application
 
         // get the arguments
         if (isset($action['_args']))
-            $this->args = json_decode($action['_args'], true);
+            $this->args = $action['_args'];
 
         // private area of the website
         if (isset($action['_enforce']))
@@ -1354,6 +1416,68 @@ class Curl
     }
 }
 
+
+/**
+ * Class to perform simple CLI tasks
+ */
+class Cli
+{
+    static public $help = '',
+                  $actions = [];
+
+    /**
+     * This is the main method that will run the function call by the php interpreter
+     */
+    public function run() {
+        global $argc, $argv, $_;
+
+        // The first element is the filename that was called with php
+        $filename = array_shift($argv);
+        // The second element should be the action
+        $action = array_shift($argv);
+
+        // Check that the action is in the actions array
+        if (!isset(self::$actions[$action]) || (!is_array(self::$actions[$action]) && !is_callable(self::$actions[$action])) ||
+            (is_array(self::$actions[$action]) && (!isset(self::$actions[$action]['_call']) || !is_callable(self::$actions[$action]['_call']))))
+        {
+            return $this->runHelp($argv);
+        } 
+ 
+        $action = self::$actions[$action];
+
+        // Check the flags and set the params
+        $args = [];
+        for ($i = 0; $i < count($argv); $i++) {
+            // Check that teh flag is valid, if not, call default
+            if ($argv[$i][0] == '-') {
+                if (isset($action['_flags']) && !in_array($argv[$i][1], $action['_flags']))
+                    return $this->runHelp($argv);
+
+                $args[$argv[$i][1]] = true;
+                continue;
+            }
+
+            // Set the parameter with a name in the args
+            if (isset($action['_params']) && count($action['_params'])) 
+                $args[array_shift($action['_params'])] = $argv[$i];
+            else 
+                $args[] = $argv[$i];
+        }
+        
+        return call_user_func(is_array($action) ? $action["_call"] : $action, $args);
+    }
+
+    /**
+     * The help action is like the default action of the routes
+     */
+    private function runHelp($args) {
+        if (is_callable(self::$help))
+            return call_user_func(self::$help, $args);
+        else
+            die("WOW! No action or help.");
+    }
+}
+
 /**
  * This is a quick access to the main features
  * @param $query this is the main query, usually in this syntax "action: query"
@@ -1362,12 +1486,14 @@ class Curl
  */
 $_ = function ($query = '', $options = [], $extras = '') {
     static $app = NULL,
-    $database = NULL,
-    $template = NULL,
-    $email = NULL,
-    $curl = NULL;
+           $cli = NULL,
+           $database = NULL,
+           $template = NULL,
+           $email = NULL,
+           $curl = NULL;
 
     $app = $app ?? new Application();
+    $cli = $cli ?? new Cli();
     $database = $database ?? new Database();
     $template = $template ?? new Template();
     $email = $email ?? new Email();
@@ -1377,10 +1503,12 @@ $_ = function ($query = '', $options = [], $extras = '') {
     list($action, $query) = Utils::extractQuery($query);
 
     // check if the action is defined
-    switch ($action) {
+    switch ($action) 
+    {
         /*********************
          * Express Init & Run
          *********************/
+
         // run the app, automatic and simple
         case 'run':
             $app->setConfig();
@@ -1534,6 +1662,16 @@ $_ = function ($query = '', $options = [], $extras = '') {
         case 'curl:':
             return $curl->sendHttp($query, $options, $extras);
             break;
+    
+        /*********************
+         * CLI ACTIONS
+         *********************/
+
+        // run cli a action
+        case 'cli':
+            $app->setConfig();
+            $database->connect();
+            die($cli->run()); 
 
         /*********************
          * Unknown action,

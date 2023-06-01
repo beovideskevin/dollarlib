@@ -3,10 +3,14 @@
 /*
 config.json
 
+@TODO PRO y DEV
+
 {
 	"WEBSITE": "localhost",
 
 	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
+
+	"ASSETS_PATH": "/application/assets/",
 
 	"TEMPLATE": 
 	{
@@ -40,7 +44,7 @@ config.json
 			"_language": "es.ini",
 			"_call": "checkLayout"
 		},
-		"urlargs/:gallery": {
+		"urlargs/:id": {
 			"_call": "checkUrlArgs",
 		},
 		"args": {
@@ -57,11 +61,11 @@ config.json
 		},
 		"checkClass": "myClass::index",
         "api": {
-				"_get": "getMethod",
-				"_post":  "postMethod",
-				"_put":  "putMethod",
-				"_delete":  "deleteMethod"
-			}
+			"_get": "getMethod",
+			"_post":  "postMethod",
+			"_put":  "putMethod",
+			"_delete":  "deleteMethod"
+		}
 	}
 }
 
@@ -73,7 +77,7 @@ Routes to test
 	/admin/evenmore
 	/logout
 	/layout
-    /urlargs/:gallery
+    /urlargs/id_123456
 	/args
 	/notgood
 	/404

@@ -8,6 +8,8 @@ config.json
 
 	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
 
+	"ASSETS_PATH": "/application/assets/",
+
     "TEMPLATE":
 	{
 		"LANGUAGE_PATH": "application/language/",
@@ -73,7 +75,7 @@ function checkTemplate($args = [])
 	$results = $_("inject: application/examples/includes/example.html");
 	$pre .= "<b>htmlOut</b>\n" . Utils::htmlOut($results, true) . "\n\n";
 
-	// This is for JS
+	// This is for JS, @TODO use assets path
 	$results = $_("inject: application/examples/includes/example.js");
 	$pre .= "<b>jsOut</b>\n" . Utils::jsOut($results) . "\n\n";
 
