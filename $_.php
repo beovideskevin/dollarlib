@@ -536,7 +536,7 @@ class Database
             return false;
 
         if ($filename)
-            $query = file_get_contents(FILES_BASE_PATH . $filename);
+            $query = file_get_contents(FILES_ABSOLUTE_PATH . $filename);
         elseif (self::$migrations)
             $query = file_get_contents(self::$migrations);
 
@@ -823,9 +823,9 @@ class Application
         // The first time we are going to do som general including
         if (!$folder) {
             // Include the vendors
-            if (!empty(self::$includes['VENDORS']) && is_dir(FILES_BASE_PATH . self::$includes['VENDORS']) &&
-                file_exists(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php')) {
-                require_once(FILES_BASE_PATH . self::$includes['VENDORS'] . 'autoload.php');
+            if (!empty(self::$includes['VENDORS']) && is_dir(FILES_ABSOLUTE_PATH . self::$includes['VENDORS']) &&
+                file_exists(FILES_ABSOLUTE_PATH . self::$includes['VENDORS'] . 'autoload.php')) {
+                require_once(FILES_ABSOLUTE_PATH . self::$includes['VENDORS'] . 'autoload.php');
             }
 
             // register all the classes
@@ -840,7 +840,7 @@ class Application
                 foreach ($folders as $f) {
                     if (!$f)
                         continue;
-                    $this->register(FILES_BASE_PATH . $f, $exceptions);
+                    $this->register(FILES_ABSOLUTE_PATH . $f, $exceptions);
                 }
             }
         } else {
@@ -1015,7 +1015,7 @@ class Template
      */
     public function setLang($language = '')
     {
-        $filename = FILES_BASE_PATH . LANGUAGE_PATH . ($language ? $language : self::$defaultLanguage);
+        $filename = FILES_ABSOLUTE_PATH . LANGUAGE_PATH . ($language ? $language : self::$defaultLanguage);
 
         $allLines = file($filename);
 
@@ -1032,7 +1032,7 @@ class Template
         }
 
         $_SESSION['LANGUAGE_IN_USE'] = $language ? $language : self::$defaultLanguage;
-        $this->fullLanguage['FILES_BASE_PATH'] = FILES_BASE_PATH;
+        $this->fullLanguage['FILES_ABSOLUTE_PATH'] = FILES_ABSOLUTE_PATH;
         $this->fullLanguage['FILES_RELATIVE_PATH'] = FILES_RELATIVE_PATH;
 
         return $this->fullLanguage;
@@ -1092,7 +1092,7 @@ class Template
      */
     public function inject($filename, $allDef = [], $clean = false)
     {
-        $filename = FILES_BASE_PATH . $filename;
+        $filename = FILES_ABSOLUTE_PATH . $filename;
 
         if (!file_exists($filename))
             return '';

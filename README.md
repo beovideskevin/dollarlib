@@ -17,7 +17,7 @@ In order to test you are going to need three files:
 
 .htaccess
 
-```
+```Text
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-d
@@ -40,7 +40,7 @@ Options -Indexes
 
 config.json
 
-```
+```JSON
 {
     "WEBSITE": "localhost",
 
@@ -81,7 +81,7 @@ config.json
 
 Remember to set these in the json or the connection to the database will fail:
 
-```
+```JSON
     "DATABASE": "your_database",
     "USER": "your_username",
     "PASSWORD": "your_password",
@@ -89,7 +89,7 @@ Remember to set these in the json or the connection to the database will fail:
 
 migrations.sql
 
-```
+```SQL
 --
 -- Basic structure to test migrations, database access, schemas, etc.
 -- 
@@ -168,7 +168,7 @@ What passes for documentation is inside the files in the form of comments.
 
 You might also want to install PHPMailer (using composer) if you want to take full advantage of the email class.
 
-TO DO
+# TO DO
 
 - [ ] Add cli examples
 - [ ] Check application examples for api requests and url arguments
