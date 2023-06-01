@@ -1,6 +1,4 @@
 /.htaccess
 /config.json
 /migrations.sql
-/tests
-/phpunit.xml
 /vendor
