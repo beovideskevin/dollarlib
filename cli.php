@@ -13,9 +13,9 @@ function runMigrations($args = []) {
     global $_;
 
     if ($_("migrations"))
-        return "OK";
+        return "OK" . PHP_EOL;
    
-    return "KO";
+    return "KO" . PHP_EOL;
 }
 
 /**

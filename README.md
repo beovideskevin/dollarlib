@@ -168,7 +168,7 @@ What passes for documentation is inside the files in the form of comments.
 
 You might also want to install PHPMailer (using composer) if you want to take full advantage of the email class.
 
-# TO DO
+## TO DO
 
 - [ ] Add cli examples
 - [ ] Check application examples for api requests and url arguments
