@@ -903,7 +903,7 @@ class Application
      */
     public function route($urlpath = '', $args = [])
     {
-        if (!$urlpath && isset($_REQUEST['_url']))
+        if (empty($urlpath) && isset($_REQUEST['_url']))
             $urlpath = $_REQUEST['_url'];
 
         if (isset(self::$httperrors[$urlpath])) {
