@@ -165,7 +165,3 @@ In order to run the examples copy the commented code at the top of each file int
 What passes for documentation is inside the files in the form of comments.
 
 You might also want to install PHPMailer (using composer) if you want to take full advantage of the email class.
-
-## TO DO
-
-- [ ] Git and clone it in the server, then in the server update for all the websites, stop using ftp to sync
