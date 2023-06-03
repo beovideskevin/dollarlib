@@ -4,28 +4,37 @@
 config.json
 
 {
-	"WEBSITE": "localhost",
+	"ENV": "DEV",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
+    "DEV": 
+    {
+		"WEBSITE": "localhost",
 
-	"TEMPLATE": 
-	{
-		"LANGUAGE_PATH": "application/language/",
-		"DEFAULT_LANGUAGE": "es.ini",
-		"LAYOUT_PATH": "application/layout/",
-		"DEFAULT_LAYOUT": "main.html"
+		"FILES_PATH": "dollarlib.eldiletante.com/",
+
+		"ASSETS_PATH": "application/assets/",
+
+		"TEMPLATE": 
+		{
+			"LANGUAGE_PATH": "application/language/",
+			"DEFAULT_LANGUAGE": "es.ini",
+			"LAYOUT_PATH": "application/layout/",
+			"DEFAULT_LAYOUT": "main.html"
+		},
+
+		"REGISTER":
+		{
+			"EXCEPTIONS": "",
+			"FOLDERS": "application/examples/"
+		},
+
+		"ROUTES":
+		{
+			"_default": "checkCurl"
+		}
 	},
 
-	"REGISTER":
-	{
-		"EXCEPTIONS": "",
-		"FOLDERS": "application/examples/"
-	},
-
-	"ROUTES":
-	{
-		"_default": "checkCurl"
-	}
+	"PRO": {}
 }
 
 */
@@ -44,17 +53,18 @@ function checkCurl()
 			'OPTIONS' => []
 		]
 	);
-	$pre = "<b>curl</b>\n" . print_r($results, true) . "\n";
+	$pre = "<b>curl:</b>\n" . print_r($results, true) . "\n";
 
 	// A longer example using the class Curl, not tested but it should be ok
+	// $data_array = [];
 	// $query_string = http_build_query($data_array); 
 	// $userpwd = array(
 	// 	"api_username" => "", 
 	// 	"api_password" => ""
 	// );
 	// $curl = new Curl();
-	// $result = $curl->sendHttp(
-	//  "https://www.example.com/",
+	// $results = $curl->sendHttp(
+	//  	"https://www.example.com/api",
 	// 	"POST", 
 	// 	"",
 	// 	[],
@@ -71,6 +81,7 @@ function checkCurl()
 	// 		CURLOPT_USERPWD        => $userpwd['api_username'].':'.$userpwd['api_password']
 	// 	]
 	// );
+	// $pre = "<b>curl</b>\n" . print_r($results, true) . "\n";
 	
 	return [
 		"EXAMPLE" => "Curl",

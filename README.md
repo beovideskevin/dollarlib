@@ -42,40 +42,49 @@ config.json
 
 ```JSON
 {
-    "WEBSITE": "localhost",
+    "ENV": "DEV",
 
-    "FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
-
-    "DATABASE": 
+    "DEV": 
     {
-        "ADAPTER": "mysql",
-        "PORT": "3306",
-        "HOST": "mysql",
-        "DATABASE": "your_database",
-        "USER": "your_username",
-        "PASSWORD": "your_password",
-        "MIGRATIONS": "migrations.sql"
+        "WEBSITE": "dollarlib",
+
+        "FILES_PATH": "",
+
+        "ASSETS_PATH": "application/assets/",
+
+        "DATABASE": 
+        {
+            "ADAPTER": "mysql",
+            "PORT": "3306",
+            "HOST": "mysql",
+            "DATABASE": "your_database",
+            "USER": "your_username",
+            "PASSWORD": "your_password",
+            "MIGRATIONS": "migrations.sql"
+        },
+
+        "TEMPLATE": 
+        {
+            "LANGUAGE_PATH": "application/language/",
+            "DEFAULT_LANGUAGE": "en.ini",
+            "LAYOUT_PATH": "application/layout/",
+            "DEFAULT_LAYOUT": "main.html"
+        },
+
+        "REGISTER":
+        {
+            "EXCEPTIONS": "",
+            "FOLDERS": "application/",
+            "VENDORS": "vendor/"
+        },
+
+        "ROUTES":
+        {
+            "default": "index"
+        }
     },
 
-    "TEMPLATE": 
-    {
-        "LANGUAGE_PATH": "application/language/",
-        "DEFAULT_LANGUAGE": "en.ini",
-        "LAYOUT_PATH": "application/layout/",
-        "DEFAULT_LAYOUT": "main.html"
-    },
-
-    "REGISTER":
-    {
-        "EXCEPTIONS": "",
-        "FOLDERS": "application/",
-        "VENDORS": "vendor/"
-    },
-
-    "ROUTES":
-    {
-        "default": "index"
-    }
+    "PRO": {}
 }
 ```
 
@@ -106,13 +115,13 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
     `id` int(11) NOT NULL,
     `name` varchar(256) NOT NULL,
-    `phone` int(11),
+    `phone` varchar(256) NOT NULL,
     `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 ALTER TABLE `user` ADD PRIMARY KEY (`id`);
 ALTER TABLE `user` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-INSERT INTO `user` (`name`, `phone`) VALUES ('kevin', 1);
+INSERT INTO `user` (`id`, `name`, `phone`) VALUES (1, 'kevin', '555 555 5555');
 
 --
 -- Address table
@@ -141,26 +150,15 @@ INSERT INTO `address` (`street`, `city`, `country`, `user`) VALUES ('2280 sw', '
 INSERT INTO `address` (`street`, `city`, `country`, `user`) VALUES ('boltana 26', 'Madrid', 'Spain', 1);
 
 --
--- Phone table
---      id (auto-increment)
---      number
---      created (timestamp)
---
-DROP TABLE IF EXISTS `phone`;
-CREATE TABLE `phone` (
-    `id` int(11) NOT NULL,
-    `number` varchar(256) NOT NULL,
-    `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-ALTER TABLE `phone` ADD PRIMARY KEY (`id`);
-ALTER TABLE `phone` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-INSERT INTO `phone` (`number`) VALUES ('786 859 5198');
-
---
 -- We are done :)
 --
 COMMIT;
+```
+
+To create the tables run:
+
+```bash
+php cli.php migrations
 ```
 
 In order to run the examples copy the commented code at the top of each file into config.json.
@@ -170,7 +168,4 @@ You might also want to install PHPMailer (using composer) if you want to take fu
 
 ## TO DO
 
-- [ ] Add cli examples
-- [ ] Check application examples for api requests and url arguments
-- [ ] Update migrations.sql file for the examples, remove tables that you don't need anymore
 - [ ] Git and clone it in the server, then in the server update for all the websites, stop using ftp to sync

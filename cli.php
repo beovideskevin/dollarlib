@@ -4,6 +4,7 @@
 // error_reporting (E_ALL);
 
 require_once('$_.php');
+$_('register: application/examples/', []); // This is only needed for the examples
 $_("cli");
 
 /**

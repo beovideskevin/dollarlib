@@ -4,44 +4,53 @@
 config.json
 
 {
-	"WEBSITE": "localhost",
+	"ENV": "DEV",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
+    "DEV": 
+    {
+		"WEBSITE": "localhost",
 
-	"REGISTER":
-	{
-		"EXCEPTIONS": "",
-		"FOLDERS": "application/examples/",
-		"VENDORS": "vendor/"
+		"FILES_PATH": "dollarlib.eldiletante.com/",
+
+		"ASSETS_PATH": "application/assets/",
+
+		"REGISTER":
+		{
+			"EXCEPTIONS": "",
+			"FOLDERS": "application/examples/",
+			"VENDORS": "vendor/"
+		},
+
+		"TEMPLATE": 
+		{
+			"LANGUAGE_PATH": "application/language/",
+			"DEFAULT_LANGUAGE": "es.ini",
+			"LAYOUT_PATH": "application/layout/",
+			"DEFAULT_LAYOUT": "main.html"
+		},
+
+		"recaptcha": {
+			"secretKey": "",
+			"siteKey": ""
+		},
+
+		"EMAIL": {
+			"SYSTEM": "",
+			"FROM": "",
+			"SERVER": "",
+			"PORT": "",
+			"USER": "",
+			"PASSWORD": "",
+			"LAYOUT": "email"
+		},
+
+		"ROUTES":
+		{
+			"_default": "checkEmail"
+		}
 	},
 
-	"TEMPLATE": 
-	{
-		"LANGUAGE_PATH": "application/language/",
-		"DEFAULT_LANGUAGE": "es.ini",
-		"LAYOUT_PATH": "application/layout/",
-		"DEFAULT_LAYOUT": "main.html"
-	},
-
-	"recaptcha": {
-		"secretKey": "",
-		"siteKey": ""
-	},
-
-	"EMAIL": {
-		"SYSTEM": "",
-		"FROM": "",
-		"SERVER": "",
-		"PORT": "",
-		"USER": "",
-		"PASSWORD": "",
-		"LAYOUT": "email"
-	},
-
-	"ROUTES":
-	{
-		"_default": "checkEmail"
-	}
+	"PRO": {}
 }
 
 */
@@ -73,28 +82,27 @@ function checkEmail($args = [])
 	// if (!empty($args['g-recaptcha-response']) && !empty($args['email']) && 
     //     !empty($args['name']) && !empty($args['message']) && empty($args['hidden'])) // Check the fields of the form and the captcha
 	// {
-    //     $output = json_decode(
-	// 		file_get_contents(
-	// 			"https://www.google.com/recaptcha/api/siteverify?secret=" . $recaptcha['secretKey'] . "&response=" . $args['g-recaptcha-response']
-	// 		), 
-	// 		true
-	// 	);
-    //     if (isset($output['success']) && $output['success'] == true &&  // Check with google if captcha worked
-				// $result = $_(											   // and send the email
-				// 	"email: " . $emailConfig['SYSTEM'],
-				// 	[
-				// 		"subject"   => "Email from yourwebsite.com",  
-				// 		"emailfrom" => $args['email'],
-				// 		"namefrom"  => $args['name']
-				// 	], 
-				// 	[
-				// 		"OUTPUT" => $args['message'] . "<br>Origin: yourwebsite.com"
-				// 	]
-				// )
-	// 		)
-	// 	{
-	// 		$emailMsg = "Email sent!"; // If we got this far the email was sent
-    //     }
+    //     	$output = json_decode(
+	// 			file_get_contents(
+	// 				"https://www.google.com/recaptcha/api/siteverify?secret=" . $recaptcha['secretKey'] . "&response=" . $args['g-recaptcha-response']
+	// 			), 
+	// 			true
+	// 		);
+    //     	if (isset($output['success']) && $output['success'] == true &&  // Check with google if captcha worked
+	// 			$result = $_(											    // and send the email
+	// 				"email: " . $emailConfig['SYSTEM'],
+	// 				[
+	// 					"subject"   => "Email from yourwebsite.com",  
+	// 					"emailfrom" => $args['email'],
+	// 					"namefrom"  => $args['name']
+	// 				], 
+	// 				[
+	// 					"OUTPUT" => $args['message'] . "<br>Origin: yourwebsite.com"
+	// 				]
+	// 			))
+	// 		{
+	// 			$emailMsg = "Email sent!"; // If we got this far the email was sent
+    //     	}
     // }
 
 	return [

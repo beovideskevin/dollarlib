@@ -642,13 +642,13 @@ class Application
 
                 // the main path
                 case 'files_path':
-                    DEFINE('FILES_ABSOLUTE_PATH', $_SERVER['DOCUMENT_ROOT'] . $value);
-                    DEFINE('FILES_RELATIVE_PATH', $value);
+                    DEFINE('FILES_ABSOLUTE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/' . $value);
+                    DEFINE('FILES_RELATIVE_PATH', '/' . $value);
                     break;
 
                 // the main path
                 case 'assets_path':
-                    DEFINE('ASSETS_BASE_PATH', $value);
+                    DEFINE('ASSETS_BASE_PATH', '/' . $value);
                     break;
 
                 // set the default template and language
@@ -824,7 +824,8 @@ class Application
         if (!$folder) {
             // Include the vendors
             if (!empty(self::$includes['VENDORS']) && is_dir(FILES_ABSOLUTE_PATH . self::$includes['VENDORS']) &&
-                file_exists(FILES_ABSOLUTE_PATH . self::$includes['VENDORS'] . 'autoload.php')) {
+                file_exists(FILES_ABSOLUTE_PATH . self::$includes['VENDORS'] . 'autoload.php')) 
+            {
                 require_once(FILES_ABSOLUTE_PATH . self::$includes['VENDORS'] . 'autoload.php');
             }
 
@@ -876,7 +877,7 @@ class Application
 
         // get the arguments
         if (isset($action['_args']))
-            $this->args = $action['_args'];
+            $this->args = (array) $action['_args'];
 
         // private area of the website
         if (isset($action['_enforce']))
@@ -1006,6 +1007,9 @@ class Template
      */
     public function getLayout()
     {
+        if (!$this->fullLayout)
+            $this->setLayout();
+
         return $this->fullLayout;
     }
 
@@ -1429,7 +1433,7 @@ class Cli
      * This is the main method that will run the function call by the php interpreter
      */
     public function run() {
-        global $argc, $argv, $_;
+        global $argc, $argv;
 
         // The first element is the filename that was called with php
         $filename = array_shift($argv);
@@ -1463,7 +1467,7 @@ class Cli
             else 
                 $args[] = $argv[$i];
         }
-        
+
         return call_user_func(is_array($action) ? $action["_call"] : $action, $args);
     }
 

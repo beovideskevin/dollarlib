@@ -4,39 +4,48 @@
 config.json
 
 {
-	"WEBSITE": "localhost",
+	"ENV": "DEV",
 
-	"FILES_BASE_PATH": "/dollarlib.eldiletante.com/",
+    "DEV": 
+    {
+		"WEBSITE": "localhost",
 
-	"TEMPLATE": 
-	{
-		"LANGUAGE_PATH": "application/language/",
-		"DEFAULT_LANGUAGE": "es.ini",
-		"LAYOUT_PATH": "application/layout/",
-		"DEFAULT_LAYOUT": "main.html"
+		"FILES_PATH": "dollarlib.eldiletante.com/",
+
+		"ASSETS_PATH": "application/assets/",
+
+		"TEMPLATE": 
+		{
+			"LANGUAGE_PATH": "application/language/",
+			"DEFAULT_LANGUAGE": "es.ini",
+			"LAYOUT_PATH": "application/layout/",
+			"DEFAULT_LAYOUT": "main.html"
+		},
+
+		"DATABASE": 
+		{
+			"ADAPTER": "mysql",
+			"PORT": "3306",
+			"HOST": "mysql",
+			"DATABASE": "",
+			"USER": "",
+			"PASSWORD": "",
+			"MIGRATIONS": "migrations.sql"
+		},
+
+		"REGISTER":
+		{
+			"EXCEPTIONS": "",
+			"FOLDERS": "application/examples/"
+		},
+
+		"ROUTES":
+		{
+			"_default": "checkDB"
+		}
 	},
 
-	"DATABASE": 
-	{
-		"ADAPTER": "mysql",
-		"PORT": "3306",
-		"HOST": "mysql",
-		"DATABASE": "",
-		"USER": "",
-		"PASSWORD": "",
-		"MIGRATIONS": "migrations.sql"
-	},
-
-	"REGISTER":
-	{
-		"EXCEPTIONS": "",
-		"FOLDERS": "application/examples/"
-	},
-
-	"ROUTES":
-	{
-		"_default": "checkDB"
-	}
+	"PRO": {}
 }
 
 */
@@ -97,10 +106,6 @@ function checkDB($args = [])
 	$results = $_("*: address ");
 	$pre .= "<b>*: address </b>\n" . print_r($results, true) . "\n";
 
-	// You can get the record as a schema, but without schemas in teh config the result is an incomplete object
-	$results = $_("schema: SELECT * FROM user");
-	$pre .= "<b>schema: SELECT * FROM user</b>\n" . print_r($results, true) . "\n";
-	
 	// Usually this is done automatically, so no need to use it most of the time
 	$results = $_("sanitize", ["text with ' ' ' in the middle"]);
 	$pre .= "<b>sanitize</b>\n" . print_r($results, true) . "\n";
