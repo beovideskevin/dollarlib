@@ -13,3 +13,11 @@ function index($args = [])
 	];
 	return $results;
 }
+
+// Route /404
+function notFound ($args = []) 
+{
+	global $_;
+	error_log('WOW (404): ' . print_r($args, true));
+	header("location: " . $_("getconfig: WEBSITE"));
+}
