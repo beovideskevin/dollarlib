@@ -1,6 +1,6 @@
-# Dollarlib
+# DollarLib
 
-Dollarlib is a simple php lib, or a very naive and flexible framework.
+DollarLib is a simple php lib, or a very naive and flexible framework.
 I created this lib to build my [new media art gallery](https://eldiletante.com/)
 
 The basic ideas behind this lib are:
